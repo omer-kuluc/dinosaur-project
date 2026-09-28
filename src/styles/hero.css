@@ -1,0 +1,188 @@
+/* ---------------------------------------------------------------
+   Hero. Mobile first: the specimen stands on the ground line with
+   the title set below it. Desktop: the specimen bleeds off the left
+   edge (it faces right, toward the title), and the title overlaps
+   its edge so type and image share one plane.
+---------------------------------------------------------------- */
+.hero {
+  --ground: 0px;
+  position: relative;
+  min-height: 100svh;
+  padding-bottom: 10svh;
+  overflow: hidden;
+}
+
+.hero__stage {
+  position: relative;
+  margin-top: var(--nav-h);
+  width: calc(100% - var(--gutter));
+  height: 52svh;
+}
+
+.hero__frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hero__sink {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.hero__img {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+
+.hero__ground {
+  position: relative;
+  height: 1.4em;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1;
+  color: var(--moss-lift);
+  user-select: none;
+}
+
+.hero__ground-line {
+  white-space: pre;
+  width: max-content;
+  letter-spacing: 0.02em;
+  transform: translateY(-0.55em);
+}
+
+.cactus {
+  --px: 2px;
+  position: absolute;
+  bottom: calc(100% - 0.5em);
+  width: calc(var(--w) * var(--px));
+  height: calc(var(--h) * var(--px));
+  fill: var(--moss-lift);
+}
+.cactus--a {
+  left: 70%;
+}
+.cactus--b {
+  left: 74%;
+  --px: 1.5px;
+}
+.cactus--c {
+  left: 91%;
+  --px: 1.5px;
+}
+
+.hero__copy {
+  position: relative;
+  z-index: 2;
+  padding: 4svh var(--gutter) 0;
+}
+
+.hero__meta {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  min-height: 1.2em;
+  margin-bottom: 18px;
+}
+
+.hero__title {
+  font-size: clamp(3.75rem, 19vw, 7.5rem);
+  line-height: 0.84;
+  letter-spacing: -0.02em;
+}
+
+.line-mask {
+  display: block;
+  overflow: clip;
+  /* Room for the cap height; Bebas has no descenders. */
+  padding-top: 0.06em;
+  margin-top: -0.06em;
+}
+
+.line {
+  display: block;
+  will-change: transform;
+}
+
+.hero__sub {
+  max-width: 34ch;
+  margin-top: 22px;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+@media (min-width: 960px) {
+  .hero {
+    --ground: 12svh;
+    height: 100svh;
+    min-height: 620px;
+    padding-bottom: 0;
+  }
+
+  .hero__stage {
+    position: absolute;
+    margin: 0;
+    left: 0;
+    top: calc(var(--nav-h) + 1svh);
+    bottom: var(--ground);
+    width: 52vw;
+    height: auto;
+  }
+
+  .hero__ground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--ground) - 1.4em);
+    font-size: 14px;
+  }
+
+  .cactus {
+    --px: 2.5px;
+  }
+  .cactus--a {
+    left: 62%;
+  }
+  .cactus--b {
+    left: 64.5%;
+    --px: 2px;
+  }
+  .cactus--c {
+    left: 84%;
+    --px: 2px;
+  }
+
+  .hero__copy {
+    position: absolute;
+    left: 44vw;
+    right: calc(var(--gutter) + 72px);
+    bottom: calc(var(--ground) + 7svh);
+    padding: 0;
+  }
+
+  .hero__meta {
+    margin-bottom: 26px;
+    padding-left: 0.4vw;
+  }
+
+  .hero__title {
+    font-size: clamp(5rem, 9.4vw, 11rem);
+  }
+
+  .hero__sub {
+    margin-top: 30px;
+    margin-left: 0.4vw;
+    font-size: 1.0625rem;
+  }
+}

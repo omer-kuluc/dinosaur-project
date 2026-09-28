@@ -1,0 +1,185 @@
+import { createAtlas, fontsReady } from './ascii'
+import { stepClip } from './stepClip'
+
+// The signature move. Each specimen image is first "decoded" as ASCII sampled
+// from its own light and shadow, then the real photograph replaces it through
+// a stepped pixel-block clip-path. Run backwards with `crumble`, the image
+// breaks down into characters that fall away (used by the hero).
+//
+// State is three numbers driven by GSAP tweens:
+//   decode  0..1  characters resolve out of scrambled glyphs
+//   reveal  0..1  the stepped clip-path uncovers the photograph
+//   crumble 0..1  characters drop and dissolve
+
+const RAMP = ' .:-=+*#%@'
+const TONES = ['#1E451C', '#2F6230', '#5E8A66', '#9DB8A6', '#D8E6DC', '#FFFFFF', '#C99A55']
+const AMBER = TONES.length - 1
+
+export function createSpecimen({ frame, img, canvas, cols = 84, clip = {}, posX = 0.5, posY = 0.5 }) {
+  const ctx = canvas.getContext('2d')
+  const state = { decode: 0, reveal: 0, crumble: 0 }
+  let ready = false
+  let destroyed = false
+  let atlas, W, H, dpr, cellW, cellH, rows
+  let charIdx, toneIdx, thr, rnd, colFall
+  let lastClip = ''
+
+  function applyClip() {
+    const v = stepClip(state.reveal, clip)
+    if (v !== lastClip) {
+      img.style.clipPath = v
+      img.style.webkitClipPath = v
+      lastClip = v
+    }
+    const showAscii = state.decode > 0 && (state.reveal < 1 || state.crumble > 0)
+    canvas.style.visibility = showAscii ? 'visible' : 'hidden'
+  }
+
+  function prepare() {
+    W = frame.clientWidth
+    H = frame.clientHeight
+    if (!W || !H || !img.naturalWidth) return false
+    dpr = Math.min(window.devicePixelRatio || 1, 2)
+    canvas.width = Math.round(W * dpr)
+    canvas.height = Math.round(H * dpr)
+
+    cellW = W / cols
+    rows = Math.max(1, Math.floor(H / (cellW * 1.8)))
+    cellH = H / rows
+    atlas = createAtlas({ chars: RAMP, colors: TONES, cellW, cellH, fontPx: cellW / 0.6, dpr })
+
+    // Sample the image at one pixel per cell, matching object-fit: cover.
+    const off = document.createElement('canvas')
+    off.width = cols
+    off.height = rows
+    const g = off.getContext('2d', { willReadFrequently: true })
+    const iw = img.naturalWidth
+    const ih = img.naturalHeight
+    const scale = Math.max(W / iw, H / ih)
+    const sw = W / scale
+    const sh = H / scale
+    g.drawImage(img, (iw - sw) * posX, (ih - sh) * posY, sw, sh, 0, 0, cols, rows)
+    const px = g.getImageData(0, 0, cols, rows).data
+
+    const n = cols * rows
+    const lum = new Float32Array(n)
+    for (let i = 0; i < n; i++) lum[i] = (0.2126 * px[i * 4] + 0.7152 * px[i * 4 + 1] + 0.0722 * px[i * 4 + 2]) / 255
+
+    // Auto-contrast: these images are dark, so stretch between percentiles.
+    const sorted = Float32Array.from(lum).sort()
+    const lo = sorted[Math.floor(n * 0.04)]
+    const hi = sorted[Math.floor(n * 0.985)]
+    const range = Math.max(0.05, hi - lo)
+
+    charIdx = new Uint8Array(n)
+    toneIdx = new Uint8Array(n)
+    thr = new Float32Array(n)
+    rnd = new Float32Array(n)
+    colFall = new Float32Array(cols)
+    for (let x = 0; x < cols; x++) colFall[x] = 0.35 + Math.random() * 0.65
+
+    const from = clip.from || 'top'
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const i = y * cols + x
+        const l = Math.pow(Math.min(1, Math.max(0, (lum[i] - lo) / range)), 0.9)
+        charIdx[i] = Math.round(l * (RAMP.length - 1))
+        const r = px[i * 4]
+        const gg = px[i * 4 + 1]
+        const b = px[i * 4 + 2]
+        const warm = r > gg * 1.12 && gg > b * 1.05 && l > 0.42
+        toneIdx[i] = warm ? AMBER : Math.min(5, Math.floor(l * 6))
+        // Characters resolve in the same direction the clip travels.
+        const along = from === 'top' ? y / rows : from === 'bottom' ? 1 - y / rows : from === 'left' ? x / cols : 1 - x / cols
+        const across = clip.flip ? 1 - x / cols : x / cols
+        thr[i] = 0.62 * Math.random() + 0.38 * (along * 0.7 + across * 0.3)
+        rnd[i] = Math.random()
+      }
+    }
+    return true
+  }
+
+  function render() {
+    if (!ready || destroyed) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    const { decode, crumble } = state
+    if (decode <= 0 || (state.reveal >= 1 && crumble <= 0)) return
+
+    const { canvas: src, cw, ch } = atlas
+    const D = decode * 1.3
+    const scrambling = decode < 1
+    const c2 = crumble * crumble
+    const fallPx = H * 0.55 * dpr
+
+    for (let y = 0; y < rows; y++) {
+      const baseY = y * cellH * dpr
+      for (let x = 0; x < cols; x++) {
+        const i = y * cols + x
+        let c = charIdx[i]
+        if (!c) continue
+        const t0 = thr[i]
+        if (t0 > D) continue
+        let t = toneIdx[i]
+        if (scrambling && D - t0 < 0.22) {
+          c = 1 + ((Math.random() * (RAMP.length - 1)) | 0)
+          t = 1
+        }
+        let py = baseY
+        if (crumble > 0) {
+          if (rnd[i] < c2 * 1.15) continue
+          py += c2 * colFall[x] * fallPx * (0.6 + (y / rows) * 0.4)
+        }
+        ctx.drawImage(src, c * cw, t * ch, cw, ch, Math.round(x * cellW * dpr), Math.round(py), cw, ch)
+      }
+    }
+  }
+
+  function set(partial) {
+    Object.assign(state, partial)
+    applyClip()
+    render()
+  }
+
+  let resizeTimer
+  const ro = new ResizeObserver(() => {
+    clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(() => {
+      if (destroyed) return
+      if (prepare()) {
+        ready = true
+        render()
+      }
+    }, 150)
+  })
+
+  const imgLoaded = img.complete && img.naturalWidth
+    ? Promise.resolve()
+    : new Promise((res) => {
+        img.addEventListener('load', res, { once: true })
+        img.addEventListener('error', res, { once: true })
+      })
+
+  const whenReady = Promise.all([imgLoaded, fontsReady()]).then(() => {
+    if (destroyed) return
+    ready = prepare()
+    ro.observe(frame)
+    applyClip()
+    render()
+  })
+
+  applyClip()
+
+  return {
+    set,
+    state,
+    ready: whenReady,
+    destroy() {
+      destroyed = true
+      clearTimeout(resizeTimer)
+      ro.disconnect()
+      img.style.clipPath = ''
+      img.style.webkitClipPath = ''
+      canvas.style.visibility = ''
+    },
+  }
+}
