@@ -90,9 +90,10 @@ export function createSpecimen({ frame, layers, canvas, preview, cols = 84, clip
     for (let i = 0; i < n; i++) lum[i] = (0.2126 * px[i * 4] + 0.7152 * px[i * 4 + 1] + 0.0722 * px[i * 4 + 2]) / 255
 
     // Auto-contrast: these images are dark, so stretch between percentiles.
-    const sorted = Float32Array.from(lum).sort()
-    const lo = sorted[Math.floor(n * 0.04)]
-    const hi = sorted[Math.floor(n * 0.985)]
+    const opaque = lum.filter((_, i) => px[i * 4 + 3] >= 110)
+    const sorted = (opaque.length ? opaque : lum).sort()
+    const lo = sorted[Math.floor(sorted.length * 0.04)]
+    const hi = sorted[Math.floor(sorted.length * 0.985)]
     const range = Math.max(0.05, hi - lo)
 
     charIdx = new Uint8Array(n)
@@ -107,7 +108,8 @@ export function createSpecimen({ frame, layers, canvas, preview, cols = 84, clip
       for (let x = 0; x < cols; x++) {
         const i = y * cols + x
         const l = Math.pow(Math.min(1, Math.max(0, (lum[i] - lo) / range)), 0.9)
-        charIdx[i] = Math.round(l * (RAMP.length - 1))
+        // Transparent pixels (a cut-out subject) stay empty.
+        charIdx[i] = px[i * 4 + 3] < 110 ? 0 : Math.round(l * (RAMP.length - 1))
         const r = px[i * 4]
         const gg = px[i * 4 + 1]
         const b = px[i * 4 + 2]

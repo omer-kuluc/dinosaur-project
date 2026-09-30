@@ -29,6 +29,9 @@ const CACTI = [
 ]
 
 const SEEN = 'night-archive:intro'
+// Review mode: play on every load. Set to true to skip it for the rest of a
+// session after the first viewing.
+const ONCE_PER_SESSION = false
 const wait = (ms) => new Promise((r) => setTimeout(r, ms))
 const loaded = (img) =>
   img.complete && img.naturalWidth ? Promise.resolve() : new Promise((r) => {
@@ -51,7 +54,7 @@ export default function Loader() {
 
       let seen = false
       try {
-        seen = sessionStorage.getItem(SEEN) === '1'
+        seen = ONCE_PER_SESSION && sessionStorage.getItem(SEEN) === '1'
       } catch {
         /* storage blocked: play the intro */
       }
@@ -63,6 +66,9 @@ export default function Loader() {
         return
       }
 
+      // A refresh would otherwise restore a mid-page position behind the intro.
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+      window.scrollTo(0, 0)
       html.classList.add('is-intro')
       lockScroll(true)
 

@@ -207,110 +207,110 @@
 }
 
 /* ---------------------------------------------------------------
-   Hero: full bleed, two depth planes, huge headline
+   Hero: one stage for type and subject. A huge stacked headline on
+   the flat ground; the cut-out dinosaur stands in front of it and
+   crosses the ends of the letters. Phones stack title over subject.
 ---------------------------------------------------------------- */
 .hero {
   position: relative;
   height: 100svh;
-  min-height: 560px;
+  min-height: 600px;
   overflow: hidden;
 }
 
-.hero__media,
-.hero__sink {
+.hero__stage {
   position: absolute;
   inset: 0;
-}
-
-.hero__sink {
-  will-change: transform;
-}
-
-.hero__layer {
-  position: absolute;
-  inset: 0;
-  will-change: transform;
-}
-
-.hero__layer img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 40% 50%;
-}
-
-.hero__scrim {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 60%;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.4) 45%, transparent);
-  pointer-events: none;
-}
-
-.hero__copy {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(72px + env(safe-area-inset-bottom));
-  align-items: end;
-  row-gap: 18px;
+  z-index: 1;
+  align-content: start;
+  padding-top: calc(var(--nav-h) + 3svh);
 }
 
 .hero__title {
   grid-column: 1 / -1;
-  font-size: 17.5vw;
+  font-size: 21.5vw;
   line-height: 0.84;
   letter-spacing: -0.02em;
 }
 
-.hero__br {
-  display: block;
-}
-
-.hero__sub-wrap {
-  grid-column: 1 / -1;
+/* "BY" shares its line with the small subtext, as a tag beside a word. */
+.hero__row {
+  display: flex;
+  align-items: center;
+  gap: 0.22em;
 }
 
 .hero__sub {
-  max-width: 26ch;
-  font-size: 0.875rem;
-  line-height: 1.45;
+  max-width: 17ch;
+  font-family: var(--font-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0;
   color: var(--ink-soft);
+}
+
+.hero__media {
+  position: absolute;
+  z-index: 2;
+  left: -18vw;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  width: 162vw;
+  aspect-ratio: 1024 / 712;
+  pointer-events: none;
+}
+
+.hero__sink {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.hero__dino {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  will-change: transform;
+}
+
+.hero__dino img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 @media (min-width: 600px) {
   .hero__title {
-    font-size: 15vw;
+    font-size: 17vw;
   }
-  .hero__sub-wrap {
-    grid-column: 5 / -1;
+  .hero__sub {
+    font-size: 0.875rem;
+  }
+  .hero__media {
+    left: auto;
+    right: -12vw;
+    width: 108vw;
+    bottom: 4svh;
   }
 }
 
 @media (min-width: 1024px) {
-  .hero__layer img {
-    object-position: 50% 30%;
-  }
-  .hero__copy {
-    bottom: 6svh;
+  .hero__stage {
+    align-content: center;
+    padding-top: calc(var(--nav-h) * 0.6);
   }
   .hero__title {
-    grid-row: 1;
-    font-size: 13.2vw;
-  }
-  .hero__br {
-    display: none;
-  }
-  .hero__sub-wrap {
-    grid-row: 1;
-    grid-column: 10 / 13;
-    align-self: end;
-    padding-bottom: 1.1vw;
+    grid-column: 1 / 10;
+    font-size: 12.8vw;
   }
   .hero__sub {
+    max-width: 19ch;
     font-size: 0.9375rem;
+  }
+  .hero__media {
+    right: -5.5vw;
+    bottom: -3svh;
+    width: 72vw;
   }
 }
 
@@ -556,14 +556,6 @@
   object-position: 50% 20%;
 }
 
-.senses__pixels {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  image-rendering: pixelated;
-}
-
 .senses__content {
   grid-column: 1 / -1;
   grid-row: 1;
@@ -766,14 +758,9 @@
 }
 
 /* ---------------------------------------------------------------
-   The measure of Sue: the daylight chapter
+   The measure of Sue: a flat moss room for the evidence
 ---------------------------------------------------------------- */
-/* A hard cut to daylight: the chapter carries its own white ground and
-   slides up over the black like a panel, instead of a grey crossfade. */
 .measures {
-  --ink: var(--black);
-  color: var(--black);
-  background: var(--white);
   padding-block: 22vh 20vh;
 }
 
@@ -786,7 +773,7 @@
   grid-column: 1 / -1;
   max-width: 44ch;
   margin-top: 22px;
-  color: rgba(0, 0, 0, 0.66);
+  color: var(--ink-soft);
 }
 
 .fig--lead {
@@ -803,6 +790,8 @@
 }
 
 .fig__value {
+  overflow: clip;
+  padding-top: 0.06em;
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -824,14 +813,14 @@
   margin-top: 0.4em;
   font-family: var(--font-mono);
   font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--ink-faint);
 }
 
 .fig__label {
   max-width: 24ch;
   margin-top: 12px;
   font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.66);
+  color: var(--ink-soft);
 }
 
 .scale {
@@ -852,7 +841,7 @@
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--ink-faint);
 }
 .scale__name {
   text-transform: uppercase;
@@ -868,10 +857,10 @@
   background: repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 8px);
 }
 .scale__bar--sue {
-  color: var(--black);
+  color: var(--white);
 }
 .scale__bar--human {
-  color: var(--moss);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .scale__ticks {
@@ -879,10 +868,10 @@
   justify-content: space-between;
   margin: 6px 0 0 98px;
   padding-top: 8px;
-  border-top: 1px solid rgba(0, 0, 0, 0.16);
+  border-top: 1px solid var(--rule);
   font-family: var(--font-mono);
   font-size: 0.625rem;
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--ink-faint);
 }
 .scale__ticks span {
   flex: 0 0 0;
@@ -964,9 +953,9 @@
 }
 
 /* ---------------------------------------------------------------
-   Anatomy: through the word, then x-ray
+   Anatomy: through the word, then one opening window
 ---------------------------------------------------------------- */
-/* Phones read the word first, then the scanned body. */
+/* Phones read the word first, then the body. */
 .anatomy__stage {
   position: relative;
   display: flex;
@@ -996,13 +985,11 @@
   overflow: hidden;
 }
 
-.anatomy__grey,
 .anatomy__color {
   position: absolute;
   inset: 0;
 }
 
-.anatomy__grey img,
 .anatomy__color img {
   width: 100%;
   height: 100%;
@@ -1010,25 +997,12 @@
   object-position: 34% 50%;
 }
 
-.anatomy__grey img {
-  filter: grayscale(1) brightness(0.5) contrast(1.15);
+.anatomy__letters {
+  display: inline-block;
 }
 
-.anatomy__scan {
-  position: absolute;
-  inset: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.anatomy__scan::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 2px;
-  background: rgba(255, 255, 255, 0.9);
+.anatomy__color img {
+  will-change: transform;
 }
 
 .anatomy__copy {
@@ -1081,7 +1055,6 @@
     inset: 0;
     aspect-ratio: auto;
   }
-  .anatomy__grey img,
   .anatomy__color img {
     object-position: 50% 50%;
   }

@@ -6,8 +6,8 @@ import { MEASURES } from '../data/content'
 const { scale } = MEASURES
 const pct = (m) => `${(m / scale.max) * 100}%`
 
-// Daylight: the one white chapter. Evidence should feel measured, so numbers
-// count up once and the scale bars grow in whole pixel steps.
+// Evidence should feel measured, so numbers rise and count up once and the
+// scale bars grow in whole pixel steps.
 function Figure({ f, lead = false }) {
   return (
     <div className={`fig${lead ? ' fig--lead' : ''}`}>
@@ -44,7 +44,10 @@ export default function Measures() {
           const o = { v: 0 }
           gsap
             .timeline({ scrollTrigger: { trigger: fig, start: 'top 88%', once: true }, delay: desktop ? i * 0.08 : 0 })
-            .fromTo(fig.querySelector('.fig__value'), { yPercent: 30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 1.1, ease: 'expo.out' }, 0)
+            // The figure rises out of its own baseline while it counts, then the
+            // unit settles in beside it.
+            .fromTo(num, { yPercent: 105 }, { yPercent: 0, duration: 1.3, ease: 'expo.out' }, 0)
+            .fromTo(fig.querySelector('.fig__unit'), { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.9, ease: 'expo.out' }, 0.45)
             .to(o, { v: to, duration: 1.8, ease: 'power3.out', onUpdate: () => (num.textContent = o.v.toFixed(dec)) }, 0)
             .fromTo(fig.querySelector('.fig__label'), { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: 'expo.out' }, 0.35)
         })
@@ -69,7 +72,7 @@ export default function Measures() {
   )
 
   return (
-    <section ref={root} id="measures" className="measures grid" data-bg="#000000" data-field="0" data-theme="light" aria-labelledby="measures-title">
+    <section ref={root} id="measures" className="measures grid" data-bg="#1e451c" data-field="0" aria-labelledby="measures-title">
       <h2 className="measures__title" id="measures-title">
         {MEASURES.title}
       </h2>

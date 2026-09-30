@@ -139,6 +139,16 @@ button {
   color: var(--white);
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* ---------- Fixed layers ---------- */
 .backdrop {
   position: fixed;
@@ -679,8 +689,7 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .specimen-ascii,
-  .senses__pixels {
+  .specimen-ascii {
     display: none;
   }
   .print,

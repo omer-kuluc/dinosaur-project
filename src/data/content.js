@@ -21,7 +21,7 @@ export const img = (id, name = `specimen-${id}`) => {
 export const HERO = {
   image: 7,
   alt: 'Biomechanical Tyrannosaurus rex roaring against a teal night sky, one eye glowing amber.',
-  title: ['T-REX:', 'ENGINEERED', 'BY EVOLUTION'],
+  title: ['T-REX:', 'ENGINEERED', 'BY', 'EVOLUTION'],
   sub: 'Built from bone, muscle, instinct and time.',
 }
 

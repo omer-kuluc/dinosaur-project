@@ -142,6 +142,8 @@ for (const id of IDS) {
     }
     const dino = await sharp(rgba, { raw: { width: crop.width, height: crop.height, channels: 4 } }).png().toBuffer()
     await renditions(dino, `hero-dino`, crop.width, { alpha: true })
+    // Transparent preview so the hero ASCII only draws the dinosaur, not the sky.
+    manifest[id].dinoPreview = await preview(dino)
   }
   console.log(`#${id}: ${crop.width}x${crop.height} (cropped ${crop.top}px top)`)
 }

@@ -4,9 +4,9 @@ import { headingLines, bodyLines, scrambleIn } from '../lib/text'
 import { ANATOMY, img } from '../data/content'
 import Picture from './Picture'
 
-// Seeing inside the body. The specimen is first visible only through the word
-// BALANCE; the camera pushes through the letters, and a scan line then sweeps
-// across, turning the grey silhouette into its full-colour internal structure.
+// Seeing the whole body. The specimen is first visible only through the word
+// BALANCE; a single window then opens from the middle of the word to the full
+// frame while the lettering dissolves into the image it was cut from.
 export default function Anatomy() {
   const root = useRef(null)
   const image = img(ANATOMY.image)
@@ -18,9 +18,9 @@ export default function Anatomy() {
       const q = gsap.utils.selector(root)
       const [stage] = q('.anatomy__stage')
       const [word] = q('.anatomy__word')
-      const [grey] = q('.anatomy__grey')
-      const [color] = q('.anatomy__color')
-      const [scan] = q('.anatomy__scan')
+      const [letters] = q('.anatomy__letters')
+      const [view] = q('.anatomy__color')
+      const [photo] = q('.anatomy__color img')
       const mm = gsap.matchMedia()
 
       mm.add(MQ, (ctx) => {
@@ -28,27 +28,31 @@ export default function Anatomy() {
         if (reduce) return
 
         const restores = [scrambleIn(q('.numeral')[0], { trigger: q('.anatomy__copy')[0], start: 'top 90%', duration: 0.8 }), scrambleIn(q('.cite')[0], { duration: 1.4 })]
-        const scanTo = (tl, at, duration) =>
-          tl
-            .fromTo(color, { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration, ease: 'none' }, at)
-            .fromTo(scan, { xPercent: 0, autoAlpha: 1 }, { xPercent: 100, duration, ease: 'none' }, at)
-            .to(scan, { autoAlpha: 0, duration: duration * 0.1 }, at + duration)
 
         if (desktop) {
-          const tl = gsap
-            .timeline({ scrollTrigger: { trigger: stage, start: 'top top', end: '+=160%', pin: true, scrub: 0.6, anticipatePin: 1 } })
-            .fromTo(word, { scale: 1 }, { scale: 9, duration: 0.4, ease: 'power2.in' }, 0.05)
-            .to(word, { autoAlpha: 0, duration: 0.12, ease: 'none' }, 0.33)
-            .fromTo(grey, { autoAlpha: 0, scale: 1.2 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'power2.out' }, 0.22)
-          scanTo(tl, 0.5, 0.3)
-          tl.to({}, { duration: 0.1 })
+          // A closed band across the middle of the word, as wide as the word.
+          const band = () => {
+            const s = stage.getBoundingClientRect()
+            const l = letters.getBoundingClientRect()
+            const mid = ((l.top + l.height / 2 - s.top) / s.height) * 100
+            const left = ((l.left - s.left) / s.width) * 100
+            const right = ((s.right - l.right) / s.width) * 100
+            return `inset(${mid}% ${right}% ${100 - mid}% ${left}%)`
+          }
+          gsap
+            .timeline({ scrollTrigger: { trigger: stage, start: 'top top', end: '+=100%', pin: true, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true } })
+            .fromTo(view, { clipPath: band }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: 'power2.inOut' }, 0.1)
+            .fromTo(photo, { scale: 1.08 }, { scale: 1, duration: 1.1, ease: 'power1.out' }, 0.1)
+            .to(word, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, 0.25)
+            .to({}, { duration: 0.15 })
           // Chapter text sits below the pinned stage and reads in normally.
           headingLines(q('.anatomy__title')[0], { scrub: true, start: 'top 88%', end: 'top 55%' })
         } else {
-          gsap.from(word, { scale: 1.12, opacity: 0, duration: 1.6, ease: 'expo.out', scrollTrigger: { trigger: word, start: 'top 85%', once: true } })
-          const tl = gsap.timeline({ scrollTrigger: { trigger: grey, start: 'top 70%', once: true } })
-          tl.fromTo(grey, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: 'power1.out' }, 0)
-          scanTo(tl, 0.4, 1.6)
+          gsap.from(word, { opacity: 0, y: 24, duration: 1.4, ease: 'expo.out', scrollTrigger: { trigger: word, start: 'top 85%', once: true } })
+          gsap
+            .timeline({ scrollTrigger: { trigger: view, start: 'top 75%', once: true } })
+            .fromTo(view, { clipPath: 'inset(16% 12% 16% 12%)', autoAlpha: 0 }, { clipPath: 'inset(0% 0% 0% 0%)', autoAlpha: 1, duration: 1.6, ease: 'expo.inOut' }, 0)
+            .fromTo(photo, { scale: 1.12 }, { scale: 1, duration: 2, ease: 'expo.out' }, 0)
           headingLines(q('.anatomy__title')[0])
         }
 
@@ -67,12 +71,10 @@ export default function Anatomy() {
     <section ref={root} id="anatomy" className="anatomy" data-bg="#122624" aria-labelledby="anatomy-title">
       <div className="anatomy__stage">
         <div className="anatomy__view">
-          <Picture data={image} sizes="100vw" className="anatomy__grey" />
           <Picture data={image} sizes="100vw" alt={ANATOMY.alt} className="anatomy__color" />
-          <span className="anatomy__scan" aria-hidden="true" />
         </div>
         <p className="anatomy__word" style={fill} aria-hidden="true">
-          {ANATOMY.word}
+          <span className="anatomy__letters">{ANATOMY.word}</span>
         </p>
       </div>
 
