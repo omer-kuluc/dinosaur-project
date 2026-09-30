@@ -1,27 +1,26 @@
 import { useRef } from 'react'
 import { gsap, SplitText, useGSAP, MQ } from '../lib/gsap'
 import { createSpecimen } from '../lib/specimen'
-import { hash2 } from '../lib/ascii'
+import { introDone } from '../lib/intro'
 import { HERO, img } from '../data/content'
-import { Cactus } from './sprites'
+import Picture from './Picture'
 
-// The Chrome-dino horizon: mostly underscores, with the odd pebble and gap.
-const GROUND = Array.from({ length: 320 }, (_, i) => {
-  const h = hash2(i, 42)
-  return h > 0.96 ? ' ' : h > 0.9 ? '.' : h > 0.86 ? '-' : h > 0.84 ? ',' : '_'
-}).join('')
-
-const wait = (ms) => new Promise((r) => setTimeout(r, ms))
-
+// Full bleed, in real depth: a synthesised clean sky plate and the separated
+// dinosaur are two planes that move independently, so pointer and scroll
+// parallax never reveal a ghost. The ASCII decode is the entrance; on scroll the
+// specimen breaks back into characters and sinks while the headline drops
+// below its own baseline.
 export default function Hero() {
   const root = useRef(null)
-  const image = img(HERO.image)
+  const plate = img(HERO.image, 'hero-plate')
+  const dino = img(HERO.image, 'hero-dino')
+  const full = img(HERO.image)
 
   useGSAP(
     () => {
       const q = gsap.utils.selector(root)
-      const [frame] = q('.hero__frame')
-      const [imgEl] = q('.hero__img')
+      const [media] = q('.hero__media')
+      const layers = q('.hero__layer')
       const [canvas] = q('.specimen-ascii')
       const [title] = q('.hero__title')
       const lines = q('.hero__title .line')
@@ -32,64 +31,74 @@ export default function Hero() {
         if (reduce) return
 
         const spec = createSpecimen({
-          frame,
-          img: imgEl,
+          frame: media,
+          layers,
           canvas,
-          cols: desktop ? 92 : 50,
-          posY: 0.3,
-          clip: { from: 'bottom', bars: desktop ? 18 : 11, steps: 22, skew: 0.5, seed: 11 },
+          preview: full.preview,
+          cols: desktop ? 112 : 54,
+          posX: desktop ? 0.5 : 0.4,
+          posY: desktop ? 0.3 : 0.5,
+          clip: { from: 'bottom', bars: desktop ? 20 : 12, steps: 22, skew: 0.5, seed: 11 },
         })
 
-        // Intro and scroll both feed one state, so scrolling during the intro
-        // never fights it: the photo shows only where both allow it.
+        // Entrance and scroll share one state so they never fight.
         const s = { decode: 0, rise: 0, sink: 0 }
         const apply = () => spec.set({ decode: s.decode, reveal: Math.min(s.rise, 1 - s.sink), crumble: s.sink })
         apply()
 
         const split = SplitText.create(lines, { type: 'chars' })
         gsap.set(split.chars, { yPercent: 115 })
-        gsap.set(q('.hero__meta, .hero__sub'), { autoAlpha: 0 })
-        const [meta] = q('.hero__meta')
-        meta.textContent = ' '
+        gsap.set(q('.hero__sub'), { autoAlpha: 0 })
 
-        // Load: characters decode out of noise, the photograph rises from the
-        // ground in pixel blocks, the title climbs out while its tracking
-        // settles to the final -2%.
         const intro = gsap
           .timeline({ paused: true })
-          .to(s, { decode: 1, duration: 1.3, ease: 'power2.out', onUpdate: apply }, 0)
-          .to(s, { rise: 1, duration: 1.6, ease: 'power2.inOut', onUpdate: apply }, 0.7)
-          .to(split.chars, { yPercent: 0, duration: 1.3, ease: 'expo.out', stagger: 0.035 }, 0.45)
-          .fromTo(title, { letterSpacing: '0.07em' }, { letterSpacing: '-0.02em', duration: 2, ease: 'expo.out' }, 0.45)
-          .set(q('.hero__meta'), { autoAlpha: 1 }, 1)
-          .to(q('.hero__meta'), { duration: 1.2, ease: 'none', scrambleText: { text: HERO.meta, chars: '.:-=+*#', revealDelay: 0.2, speed: 0.5 } }, 1)
-          .fromTo(q('.hero__sub'), { autoAlpha: 0, yPercent: 30 }, { autoAlpha: 1, yPercent: 0, duration: 1.4, ease: 'expo.out' }, 1.35)
-        Promise.race([spec.ready, wait(2500)]).then(() => intro.play())
+          .to(s, { decode: 1, duration: 1.1, ease: 'power2.out', onUpdate: apply }, 0)
+          .to(s, { rise: 1, duration: 1.5, ease: 'power2.inOut', onUpdate: apply }, 0.5)
+          .to(split.chars, { yPercent: 0, duration: 1.3, ease: 'expo.out', stagger: 0.026 }, 0.75)
+          .fromTo(title, { letterSpacing: '0.06em' }, { letterSpacing: '-0.02em', duration: 2.1, ease: 'expo.out' }, 0.75)
+          .fromTo(q('.hero__sub'), { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'expo.out' }, 1.55)
+        introDone.then(() => intro.play())
 
-        // Scroll: the specimen sinks back into the ground. The photograph
-        // breaks into characters from the top down, the characters fall and
-        // dissolve, and the title sinks below its own baseline.
+        // Pointer depth: the head moves more than the sky behind it.
+        let offPointer = () => {}
+        if (desktop && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          const to = (el, prop) => gsap.quickTo(el, prop, { duration: 1.4, ease: 'power3.out' })
+          const [plateX, plateY, dinoX, dinoY] = [to(layers[0], 'x'), to(layers[0], 'y'), to(layers[1], 'x'), to(layers[1], 'y')]
+          const onMove = (e) => {
+            const nx = e.clientX / window.innerWidth - 0.5
+            const ny = e.clientY / window.innerHeight - 0.5
+            plateX(nx * -8)
+            plateY(ny * -5)
+            dinoX(nx * -24)
+            dinoY(ny * -12)
+          }
+          window.addEventListener('pointermove', onMove, { passive: true })
+          offPointer = () => window.removeEventListener('pointermove', onMove)
+        }
+
         gsap
           .timeline({
             scrollTrigger: {
               trigger: root.current,
               start: 'top top',
-              end: desktop ? '+=100%' : 'bottom top',
+              end: desktop ? '+=80%' : 'bottom top',
               pin: desktop,
               scrub: desktop ? 0.6 : 0.4,
               anticipatePin: 1,
             },
           })
-          .to(s, { sink: 1, duration: 1, ease: 'none', onUpdate: apply }, 0)
-          .to(q('.hero__sink'), { yPercent: 34, duration: 1, ease: 'power1.in' }, 0)
-          .to(lines, { yPercent: 118, duration: 0.55, ease: 'power2.in', stagger: 0.12 }, 0.12)
-          .to(q('.hero__meta-wrap, .hero__sub-wrap'), { autoAlpha: 0, y: 30, duration: 0.3, ease: 'power1.in' }, 0.04)
-          .to(q('.hero__ground-line'), { xPercent: -22, duration: 1, ease: 'none' }, 0)
-          .to(q('.cactus'), { x: () => -window.innerWidth * 0.28, duration: 1, ease: 'none' }, 0)
+          // Planes separate first, then the specimen sinks.
+          .to(layers[0], { yPercent: 4, duration: 0.35, ease: 'none' }, 0)
+          .to(layers[1], { yPercent: -3, scale: 1.05, duration: 0.35, ease: 'none' }, 0)
+          .to(s, { sink: 1, duration: 0.8, ease: 'none', onUpdate: apply }, 0.2)
+          .to(q('.hero__sink'), { yPercent: 28, duration: 0.8, ease: 'power1.in' }, 0.2)
+          .to(lines, { yPercent: 118, duration: 0.45, ease: 'power2.in', stagger: 0.1 }, 0.24)
+          .to(q('.hero__sub-wrap'), { autoAlpha: 0, y: 24, duration: 0.25, ease: 'power1.in' }, 0.12)
+          .to(q('.hero__scrim'), { opacity: 0, duration: 0.4, ease: 'none' }, 0.6)
 
         return () => {
+          offPointer()
           spec.destroy()
-          meta.textContent = HERO.meta
         }
       })
 
@@ -99,43 +108,27 @@ export default function Hero() {
   )
 
   return (
-    <section ref={root} className="hero" data-mya="0" aria-labelledby="hero-title">
-      <div className="hero__stage">
-        <div className="hero__frame">
-          <div className="hero__sink">
-            <canvas className="specimen-ascii" aria-hidden="true" />
-            <img
-              className="hero__img"
-              src={image.src}
-              srcSet={image.srcSet}
-              sizes="(min-width: 960px) 52vw, 100vw"
-              width={image.width}
-              height={image.height}
-              alt={HERO.alt}
-              fetchPriority="high"
-              decoding="async"
-            />
-          </div>
+    <section ref={root} className="hero" data-mya="0" data-bg="#0b1619" aria-labelledby="hero-title">
+      <div className="hero__media">
+        <div className="hero__sink">
+          <canvas className="specimen-ascii" aria-hidden="true" />
+          <Picture data={plate} className="hero__layer hero__plate" sizes="100vw" eager />
+          <Picture data={dino} className="hero__layer hero__dino" sizes="100vw" alt={HERO.alt} eager />
         </div>
       </div>
+      <div className="hero__scrim" aria-hidden="true" />
 
-      <div className="hero__ground" aria-hidden="true">
-        <Cactus kind="tall" className="cactus--a" />
-        <Cactus kind="short" className="cactus--b" />
-        <Cactus kind="tall" className="cactus--c" />
-        <div className="hero__ground-line">{GROUND}</div>
-      </div>
-
-      <div className="hero__copy">
-        <div className="hero__meta-wrap">
-          <p className="hero__meta">{HERO.meta}</p>
-        </div>
-        <h1 className="hero__title" id="hero-title" aria-label={HERO.lines.join(' ')}>
-          {HERO.lines.map((l) => (
-            <span className="line-mask" key={l} aria-hidden="true">
-              <span className="line">{l}</span>
+      <div className="hero__copy grid">
+        <h1 className="hero__title" id="hero-title" aria-label="T-Rex: Engineered by Evolution">
+          <span className="line-mask" aria-hidden="true">
+            <span className="line">
+              {HERO.title[0]} <span className="hero__br" />
+              {HERO.title[1]}
             </span>
-          ))}
+          </span>
+          <span className="line-mask" aria-hidden="true">
+            <span className="line">{HERO.title[2]}</span>
+          </span>
         </h1>
         <div className="hero__sub-wrap">
           <p className="hero__sub">{HERO.sub}</p>

@@ -1,25 +1,35 @@
 import { useEffect } from 'react'
 import { ScrollTrigger } from './lib/gsap'
 import { initScroll } from './lib/scroll'
-import { EXHIBITS } from './data/content'
+import { preloadAhead } from './lib/preload'
 import AsciiField from './components/AsciiField'
+import Loader from './components/Loader'
 import Nav from './components/Nav'
 import DepthMeter from './components/DepthMeter'
 import Trail from './components/Trail'
 import Hero from './components/Hero'
-import Intro from './components/Intro'
-import Exhibit from './components/Exhibit'
+import Statement from './components/Statement'
+import Discovery from './components/Discovery'
+import Senses from './components/Senses'
+import Bite from './components/Bite'
 import Measures from './components/Measures'
+import Anatomy from './components/Anatomy'
 import Closing from './components/Closing'
+import Atmosphere from './components/Atmosphere'
+import GridOverlay from './components/GridOverlay'
 
 export default function App() {
   useEffect(() => {
     const stop = initScroll()
+    const stopPreload = preloadAhead()
     // Every component has registered its triggers by now; measure once more
     // after webfonts settle line heights.
     ScrollTrigger.refresh()
     document.fonts.ready.then(() => ScrollTrigger.refresh())
-    return stop
+    return () => {
+      stop()
+      stopPreload()
+    }
   }, [])
 
   return (
@@ -30,18 +40,21 @@ export default function App() {
       <main className="page" id="top">
         <Trail />
         <Hero />
-        <Intro />
-        <Exhibit data={EXHIBITS[0]} index={0} mya={66} />
-        <Exhibit data={EXHIBITS[1]} index={1} />
+        <Statement />
+        <Discovery />
+        <Senses />
+        <Bite />
         <Measures />
-        <Exhibit data={EXHIBITS[2]} index={2} />
-        <Exhibit data={EXHIBITS[3]} index={3} myaOut={68} />
+        <Anatomy />
         <Closing />
-        <footer className="footer">
+        <footer className="footer grid">
           <p className="footer__mark">The Night Archive</p>
           <p className="footer__note">A design study. Illustrations are artistic reconstructions, not scientific renderings.</p>
         </footer>
       </main>
+      <Atmosphere />
+      <Loader />
+      <GridOverlay />
     </>
   )
 }

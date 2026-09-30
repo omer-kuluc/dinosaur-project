@@ -44,3 +44,24 @@ export function stepClip(p, { bars = 14, steps = 18, from = 'top', skew = 0.55, 
   }
   return `polygon(${pts.join(', ')})`
 }
+
+// The Bite: the frame opens like a pair of jaws. The visible region lies
+// between an upper jaw line with teeth pointing down and a lower jaw line with
+// teeth pointing up, offset by half a tooth so they interlock when closed.
+// Teeth shrink as the jaws open, so the fully open frame is a clean rectangle.
+export function jawClip(p, { teeth = 14 } = {}) {
+  if (p <= 0) return 'polygon(0% 50%, 100% 50%, 100% 50%, 0% 50%)'
+  if (p >= 1) return 'none'
+  const tooth = 9 * (1 - p)
+  // At open = tooth / 2 both zigzags coincide (zero area); open past the edges.
+  const open = tooth / 2 + p * 64
+  const top = []
+  const bottom = []
+  for (let i = 0; i <= teeth * 2; i++) {
+    const x = (i / (teeth * 2)) * 100
+    const tipTop = i % 2 === 1
+    top.push(`${f(x)} ${f(50 - open + (tipTop ? tooth : 0))}`)
+    bottom.push(`${f(x)} ${f(50 + open - (tipTop ? 0 : tooth))}`)
+  }
+  return `polygon(${[...top, ...bottom.reverse()].join(', ')})`
+}

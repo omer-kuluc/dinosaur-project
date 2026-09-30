@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "skill": "design-dna",
+    "phases": ["analyze", "generate"],
+    "reference": "https://eiger-extreme.mammut.com/en (structure and rhythm only; nothing copied)",
+    "method": "16 headless captures at 1440x900 across the full page, computed styles for type, pixel-bucket palette measurement (the skill's measure-colors script is not installed, an equivalent was run on the same captures)",
+    "note": "Reference DNA is used for layout, hierarchy, scale and rhythm. Palette, type and effects come from the Night Archive brief."
+  },
+  "reference_dna": {
+    "design_system": {
+      "color": {
+        "measured_palette": [
+          { "hex": "#feffff", "coverage": 0.166, "role": "solid white chapter blocks" },
+          { "hex": "#23293c", "coverage": 0.159, "role": "dark product stage" },
+          { "hex": "#a1a1a1", "coverage": 0.042, "role": "neutral" },
+          { "hex": "#07070b", "coverage": 0.022, "role": "near black" },
+          { "hex": "#f56905", "coverage": 0.015, "role": "single saturated accent" }
+        ],
+        "measurement": { "method": "4-bit channel buckets over downscaled captures", "captures": 16 },
+        "principle": "Large solid color blocks alternate with full-bleed photography; one accent at roughly 1.5 percent coverage."
+      },
+      "typography": {
+        "families": ["WhyteInktrap (display)", "Helvetica Now Text (text)"],
+        "scale": {
+          "hero_word": "403px at 1440 (28vw), tracking -6%, line-height 1",
+          "editorial_paragraph": "67px (4.6vw), tracking -6%, line-height 1.1",
+          "annotation": "12-14px, tracking -6%"
+        },
+        "principle": "Two extremes and almost nothing in between. Huge words and tiny annotations create depth; long statements are set as large paragraphs, not as body copy."
+      },
+      "spacing": { "density": "airy", "rhythm": "each chapter is roughly one to two viewports, generous empty space around small annotations" },
+      "layout": {
+        "grid": "wide 12 column feel, frequent full-bleed breaks",
+        "compositions_observed": [
+          "full-bleed photo with giant word",
+          "white field with inset photo at about 80 percent width and a tiny caption",
+          "dark stage with an isolated object and hairline annotations",
+          "solid accent block with a triptych of photos",
+          "centered statement over a darkened photo",
+          "scattered asymmetric collage with a thin route line",
+          "text-only large paragraph on white"
+        ],
+        "principle": "No composition repeats back to back."
+      },
+      "shape": { "radius": "0 for images and blocks", "borders": "hairlines only for annotations" },
+      "motion": { "character": "calm, large-scale, scroll-led; images scale and clip rather than fade" }
+    },
+    "design_style": {
+      "mood": ["expeditionary", "confident", "editorial", "cold"],
+      "composition": "cinematic cuts between photography and flat color fields",
+      "imagery": "documentary photography at very large scale",
+      "ornamentation": "minimal, information-bearing only"
+    }
+  },
+  "night_archive_dna": {
+    "design_system": {
+      "color": {
+        "core": { "black": "#000000", "white": "#FFFFFF", "abyss": "#122624", "moss": "#1E451C" },
+        "depth": { "abyss_deep": "#0B1A18", "moss_lift": "#4A7A4C" },
+        "accent": { "amber": "#C99A55", "source": "measured from specimen eyes and mouths (#B58E50 average), lifted for contrast", "coverage_target": "under 2 percent" },
+        "specimen_measured": ["#020507", "#091819", "#072626", "#162724", "#2b362c"],
+        "principle": "Specimen photography already sits beside #122624, so solid abyss, moss and white blocks read as native to the images."
+      },
+      "typography": {
+        "display": "Bebas Neue, tracking -0.02em, used only at large sizes",
+        "text": "IBM Plex Sans 300/400/500",
+        "annotation": "IBM Plex Mono 11px for catalogue lines",
+        "scale": { "hero": "11.5vw desktop, 17vw mobile", "chapter": "7-9vw", "statement": "4.2vw Plex Sans 300", "body": "16-17px", "annotation": "11-13px" },
+        "principle": "Borrow the reference's extremes: huge display against tiny annotation, large paragraphs as statements."
+      },
+      "layout": { "grid": "12 / 8 / 4 columns at >=1024 / 600-1023 / <600", "margins": "clamp(40px, 4vw, 72px) / 32px / 16px", "gutters": "24px / 20px / 12px" },
+      "shape": { "radius": 0 },
+      "motion": { "easing": "expo.out for reveals, power2.inOut for clips, none for scrubs", "rule": "each image owns a different reveal" }
+    },
+    "visual_effects": {
+      "ascii_field": { "enabled": true, "tech": "Canvas 2D glyph atlas", "performance_tier": "medium desktop, low mobile" },
+      "ascii_decode": { "enabled": true, "used_on": ["hero", "relatives"], "role": "signature bookend" },
+      "hero_depth": { "enabled": true, "tech": "separated dinosaur layer over a synthesised clean sky plate", "motion": "scroll and pointer parallax" },
+      "per_section_reveals": ["slit opening", "depixelate focus", "jaw clip", "type mask zoom and scan line"],
+      "intro": { "enabled": true, "tech": "DOM + SVG pixel sprites, GSAP timeline" }
+    }
+  }
+}

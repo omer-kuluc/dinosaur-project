@@ -1,12 +1,15 @@
 import { createAtlas, fontsReady } from './ascii'
 import { stepClip } from './stepClip'
 
-// The signature move. Each specimen image is first "decoded" as ASCII sampled
-// from its own light and shadow, then the real photograph replaces it through
-// a stepped pixel-block clip-path. Run backwards with `crumble`, the image
-// breaks down into characters that fall away (used by the hero).
+// The signature move, used on the first and last image only.
+// The image is first "decoded" as ASCII sampled from its own light and shadow,
+// then the photograph replaces it through a stepped pixel-block clip-path.
+// Run backwards with `crumble`, the image breaks down into falling characters.
 //
-// State is three numbers driven by GSAP tweens:
+// The ASCII samples a ~2 KB inline preview, so it can start before the real
+// photograph has downloaded. The photo layer only takes over once it has
+// actually loaded; until then the characters stay on screen.
+//
 //   decode  0..1  characters resolve out of scrambled glyphs
 //   reveal  0..1  the stepped clip-path uncovers the photograph
 //   crumble 0..1  characters drop and dissolve
@@ -15,30 +18,51 @@ const RAMP = ' .:-=+*#%@'
 const TONES = ['#1E451C', '#2F6230', '#5E8A66', '#9DB8A6', '#D8E6DC', '#FFFFFF', '#C99A55']
 const AMBER = TONES.length - 1
 
-export function createSpecimen({ frame, img, canvas, cols = 84, clip = {}, posX = 0.5, posY = 0.5 }) {
+const loadImage = (src) =>
+  new Promise((res) => {
+    const i = new Image()
+    i.onload = () => res(i)
+    i.onerror = () => res(null)
+    i.src = src
+  })
+
+const whenLoaded = (el) =>
+  el.complete && el.naturalWidth
+    ? Promise.resolve()
+    : new Promise((res) => {
+        el.addEventListener('load', res, { once: true })
+        el.addEventListener('error', res, { once: true })
+      })
+
+export function createSpecimen({ frame, layers, canvas, preview, cols = 84, clip = {}, posX = 0.5, posY = 0.5 }) {
   const ctx = canvas.getContext('2d')
   const state = { decode: 0, reveal: 0, crumble: 0 }
   let ready = false
+  let photoReady = false
   let destroyed = false
+  let source = null
   let atlas, W, H, dpr, cellW, cellH, rows
   let charIdx, toneIdx, thr, rnd, colFall
   let lastClip = ''
 
   function applyClip() {
-    const v = stepClip(state.reveal, clip)
+    // Hold the photo back until it has pixels to show.
+    const v = stepClip(photoReady ? state.reveal : 0, clip)
     if (v !== lastClip) {
-      img.style.clipPath = v
-      img.style.webkitClipPath = v
+      for (const l of layers) {
+        l.style.clipPath = v
+        l.style.webkitClipPath = v
+      }
       lastClip = v
     }
-    const showAscii = state.decode > 0 && (state.reveal < 1 || state.crumble > 0)
-    canvas.style.visibility = showAscii ? 'visible' : 'hidden'
+    const photoCovers = photoReady && state.reveal >= 1 && state.crumble <= 0
+    canvas.style.visibility = state.decode > 0 && !photoCovers ? 'visible' : 'hidden'
   }
 
   function prepare() {
     W = frame.clientWidth
     H = frame.clientHeight
-    if (!W || !H || !img.naturalWidth) return false
+    if (!W || !H || !source) return false
     dpr = Math.min(window.devicePixelRatio || 1, 2)
     canvas.width = Math.round(W * dpr)
     canvas.height = Math.round(H * dpr)
@@ -48,17 +72,17 @@ export function createSpecimen({ frame, img, canvas, cols = 84, clip = {}, posX 
     cellH = H / rows
     atlas = createAtlas({ chars: RAMP, colors: TONES, cellW, cellH, fontPx: cellW / 0.6, dpr })
 
-    // Sample the image at one pixel per cell, matching object-fit: cover.
+    // One sample per cell, matching object-fit: cover and object-position.
     const off = document.createElement('canvas')
     off.width = cols
     off.height = rows
     const g = off.getContext('2d', { willReadFrequently: true })
-    const iw = img.naturalWidth
-    const ih = img.naturalHeight
+    const iw = source.naturalWidth
+    const ih = source.naturalHeight
     const scale = Math.max(W / iw, H / ih)
     const sw = W / scale
     const sh = H / scale
-    g.drawImage(img, (iw - sw) * posX, (ih - sh) * posY, sw, sh, 0, 0, cols, rows)
+    g.drawImage(source, (iw - sw) * posX, (ih - sh) * posY, sw, sh, 0, 0, cols, rows)
     const px = g.getImageData(0, 0, cols, rows).data
 
     const n = cols * rows
@@ -103,7 +127,7 @@ export function createSpecimen({ frame, img, canvas, cols = 84, clip = {}, posX 
     if (!ready || destroyed) return
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     const { decode, crumble } = state
-    if (decode <= 0 || (state.reveal >= 1 && crumble <= 0)) return
+    if (decode <= 0 || canvas.style.visibility === 'hidden') return
 
     const { canvas: src, cw, ch } = atlas
     const D = decode * 1.3
@@ -144,25 +168,26 @@ export function createSpecimen({ frame, img, canvas, cols = 84, clip = {}, posX 
   const ro = new ResizeObserver(() => {
     clearTimeout(resizeTimer)
     resizeTimer = setTimeout(() => {
-      if (destroyed) return
-      if (prepare()) {
+      if (!destroyed && prepare()) {
         ready = true
         render()
       }
     }, 150)
   })
 
-  const imgLoaded = img.complete && img.naturalWidth
-    ? Promise.resolve()
-    : new Promise((res) => {
-        img.addEventListener('load', res, { once: true })
-        img.addEventListener('error', res, { once: true })
-      })
-
-  const whenReady = Promise.all([imgLoaded, fontsReady()]).then(() => {
-    if (destroyed) return
+  // The preview is inline, so this resolves almost immediately.
+  const whenReady = Promise.all([loadImage(preview), fontsReady()]).then(([p]) => {
+    if (destroyed || !p) return
+    source = p
     ready = prepare()
     ro.observe(frame)
+    applyClip()
+    render()
+  })
+
+  Promise.all(layers.map((l) => whenLoaded(l.tagName === 'IMG' ? l : l.querySelector('img')))).then(() => {
+    if (destroyed) return
+    photoReady = true
     applyClip()
     render()
   })
@@ -177,8 +202,10 @@ export function createSpecimen({ frame, img, canvas, cols = 84, clip = {}, posX 
       destroyed = true
       clearTimeout(resizeTimer)
       ro.disconnect()
-      img.style.clipPath = ''
-      img.style.webkitClipPath = ''
+      for (const l of layers) {
+        l.style.clipPath = ''
+        l.style.webkitClipPath = ''
+      }
       canvas.style.visibility = ''
     },
   }

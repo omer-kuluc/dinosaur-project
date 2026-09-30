@@ -14,12 +14,20 @@ export function initScroll() {
   const raf = (time) => lenis.raf(time * 1000)
   gsap.ticker.add(raf)
   gsap.ticker.lagSmoothing(0)
+  // The intro may have locked the page before Lenis existed.
+  if (document.documentElement.classList.contains('is-locked')) lenis.stop()
 
   return () => {
     gsap.ticker.remove(raf)
     lenis.destroy()
     lenis = null
   }
+}
+
+// Used by the intro to hold the page still until the hero is revealed.
+export function lockScroll(locked) {
+  document.documentElement.classList.toggle('is-locked', locked)
+  if (lenis) locked ? lenis.stop() : lenis.start()
 }
 
 export function scrollToTarget(target, { offset = 0, duration = 1.8 } = {}) {

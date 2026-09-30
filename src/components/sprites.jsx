@@ -79,10 +79,10 @@ const CACTI = {
   short: ['..#..', '..#.#', '#.#.#', '#.###', '###..', '..#..', '..#..'],
 }
 
-export function Cactus({ kind = 'tall', className = '' }) {
+export function Cactus({ kind = 'tall', className = '', style = {} }) {
   const rows = CACTI[kind]
   return (
-    <svg className={`cactus ${className}`} viewBox={`0 0 ${rows[0].length} ${rows.length}`} shapeRendering="crispEdges" aria-hidden="true" style={{ '--w': rows[0].length, '--h': rows.length }}>
+    <svg className={`cactus ${className}`} viewBox={`0 0 ${rows[0].length} ${rows.length}`} shapeRendering="crispEdges" aria-hidden="true" style={{ '--w': rows[0].length, '--h': rows.length, ...style }}>
       <path d={toPath(rows)} />
     </svg>
   )

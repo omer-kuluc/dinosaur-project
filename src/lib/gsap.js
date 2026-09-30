@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin, ScrambleTextPlug
 // every one of those would make pinned and scrubbed sections jump.
 ScrollTrigger.config({ ignoreMobileResize: true })
 
-export const BREAKPOINT = 960
+export const BREAKPOINT = 1024
 
 // One set of conditions shared by every component so desktop, mobile and
 // reduced-motion branches always agree.

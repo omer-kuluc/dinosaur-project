@@ -2,7 +2,7 @@
    The Night Archive: tokens
    Core palette is fixed by the brief. Extra greens exist only for
    depth; amber (measured from the specimens' eyes) is rationed to
-   chapter numerals and the depth readout.
+   numerals, the depth readout and the intro meteor.
 ---------------------------------------------------------------- */
 :root {
   --black: #000000;
@@ -12,12 +12,13 @@
 
   --abyss-deep: #0b1a18;
   --moss-lift: #4a7a4c;
+  --moss-dark: #2f6230;
   --amber: #c99a55;
 
   --ink: var(--white);
   --ink-soft: rgba(255, 255, 255, 0.72);
-  --ink-faint: rgba(255, 255, 255, 0.46);
-  --rule: rgba(255, 255, 255, 0.12);
+  --ink-faint: rgba(255, 255, 255, 0.48);
+  --rule: rgba(255, 255, 255, 0.14);
 
   --font-display: 'Bebas Neue', 'Arial Narrow', sans-serif;
   --font-text: 'IBM Plex Sans', system-ui, sans-serif;
@@ -25,20 +26,44 @@
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --nav-h: 60px;
-  --gutter: 16px;
+
+  /* Grid: 4 columns on phones, 8 on tablets, 12 from 1024px. */
+  --cols: 4;
+  --margin: 16px;
+  --gap: 12px;
 
   /* z-index scale */
+  --z-backdrop: -1;
   --z-field: 0;
   --z-page: 1;
   --z-meter: 20;
   --z-nav: 30;
+  --z-loader: 100;
+  --z-overlay: 200;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 600px) {
   :root {
-    --nav-h: 72px;
-    --gutter: clamp(32px, 4vw, 64px);
+    --cols: 8;
+    --margin: 32px;
+    --gap: 20px;
   }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --cols: 12;
+    --margin: clamp(40px, 4vw, 72px);
+    --gap: 24px;
+    --nav-h: 72px;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gap);
+  padding-inline: var(--margin);
 }
 
 *,
@@ -53,6 +78,10 @@ html {
   text-size-adjust: 100%;
 }
 
+html.is-locked {
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   min-height: 100%;
@@ -61,8 +90,6 @@ body {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.65;
-  /* Surface is deep teal; the dig darkens toward black. */
-  background: linear-gradient(180deg, var(--abyss) 0, var(--abyss-deep) 140vh, #050c0b 45%, var(--black) 80%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -77,13 +104,19 @@ h3 {
   line-height: 0.88;
 }
 
-p {
+p,
+dl,
+figure {
   margin: 0;
 }
 
 img {
   display: block;
   max-width: 100%;
+}
+
+picture {
+  display: block;
 }
 
 pre {
@@ -97,7 +130,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--white);
+  outline: 2px solid currentColor;
   outline-offset: 4px;
 }
 
@@ -106,14 +139,26 @@ button {
   color: var(--white);
 }
 
-/* ---------- Layers ---------- */
-.field {
+/* ---------- Fixed layers ---------- */
+.backdrop {
   position: fixed;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  background: var(--abyss);
+}
+
+.field-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-field);
+  pointer-events: none;
+}
+
+.field {
+  position: absolute;
   inset: 0;
   width: 100%;
   height: 100lvh;
-  z-index: var(--z-field);
-  pointer-events: none;
 }
 
 .page {
@@ -132,6 +177,75 @@ button {
   position: absolute;
   width: 1px;
   height: 1px;
+  pointer-events: none;
+}
+
+/* ---------- Shared text roles ---------- */
+.line-mask {
+  display: block;
+  overflow: clip;
+  padding-top: 0.06em;
+  margin-top: -0.06em;
+}
+
+.line {
+  display: block;
+  will-change: transform;
+}
+
+.numeral {
+  min-height: 1em;
+  margin-bottom: 14px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+}
+
+.cite {
+  min-height: 1.5em;
+  margin-top: 24px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.facts {
+  display: grid;
+  gap: 10px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.facts > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 16px;
+  align-items: baseline;
+}
+
+.facts dt {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.facts dd {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.specimen-ascii {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
   pointer-events: none;
 }
 
@@ -173,8 +287,12 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--gutter);
-  transition: transform 0.7s var(--ease-out);
+  padding: 0 var(--margin);
+  color: var(--white);
+  transition:
+    transform 0.7s var(--ease-out),
+    color 0.5s var(--ease-out),
+    opacity 0.8s var(--ease-out);
 }
 
 .nav::before {
@@ -184,6 +302,7 @@ button {
   z-index: -1;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent);
   pointer-events: none;
+  transition: opacity 0.5s var(--ease-out);
 }
 
 .nav.is-hidden {
@@ -202,18 +321,17 @@ button {
   display: none;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 1024px) {
   .nav__links {
     display: flex;
     gap: 36px;
-    margin-right: 72px;
   }
   .nav__links a {
     position: relative;
     font-size: 0.875rem;
-    color: var(--ink-soft);
     text-decoration: none;
-    transition: color 0.4s var(--ease-out);
+    opacity: 0.72;
+    transition: opacity 0.4s var(--ease-out);
   }
   .nav__links a::after {
     content: '';
@@ -228,7 +346,7 @@ button {
     transition: transform 0.5s var(--ease-out);
   }
   .nav__links a:hover {
-    color: var(--white);
+    opacity: 1;
   }
   .nav__links a:hover::after {
     transform: scaleX(1);
@@ -237,34 +355,34 @@ button {
 }
 
 /* ---------- Depth meter ----------
-   Mobile: the runner crosses a ground line at the bottom of the screen,
-   as in the offline game. Desktop: it descends a vertical gauge. */
+   Below 1024px the runner crosses a ground line at the bottom of the
+   screen, as in the offline game. From 1024px it descends a vertical
+   gauge in the right margin. Position lives on .meter__runner; only the
+   sprite inside flips, so facing can never displace it. */
 .meter {
   --p: 0;
+  --run: calc(100vw - 2 * var(--margin) - 18px);
   position: fixed;
   z-index: var(--z-meter);
   pointer-events: none;
-  left: var(--gutter);
-  right: var(--gutter);
+  left: var(--margin);
+  right: var(--margin);
   bottom: calc(10px + env(safe-area-inset-bottom));
   height: 22px;
+  color: var(--white);
+  transition: opacity 0.8s var(--ease-out);
 }
 
 /* Scrim only where the ground line sits, so passing text stays legible. */
 .meter::before {
   content: '';
   position: absolute;
-  left: calc(var(--gutter) * -1);
-  right: calc(var(--gutter) * -1);
+  left: calc(var(--margin) * -1);
+  right: calc(var(--margin) * -1);
   bottom: calc(-10px - env(safe-area-inset-bottom));
   height: calc(64px + env(safe-area-inset-bottom));
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.92) 30%, transparent);
-}
-
-@media (min-width: 960px) {
-  .meter::before {
-    display: none;
-  }
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 30%, transparent);
+  transition: opacity 0.5s var(--ease-out);
 }
 
 .meter__track {
@@ -273,16 +391,22 @@ button {
   right: 0;
   bottom: 0;
   height: 1px;
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.meter__runner {
+  position: absolute;
+  left: 0;
+  bottom: 1px;
+  width: 18px;
+  height: 17px;
+  transform: translate3d(calc(var(--p) * var(--run)), 0, 0);
 }
 
 .meter__rex {
-  position: absolute;
-  bottom: 1px;
-  left: 0;
-  width: 18px;
-  height: 17px;
-  transform: translateX(calc(var(--p) * (100vw - 2 * var(--gutter) - 18px)));
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .meter__readout {
@@ -296,6 +420,7 @@ button {
   font-size: 0.625rem;
   letter-spacing: 0.04em;
   color: var(--ink-faint);
+  text-transform: uppercase;
 }
 
 .meter__num {
@@ -306,67 +431,82 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
-.meter__unit {
-  display: none;
-}
-
-@media (min-width: 960px) {
+@media (min-width: 1024px) {
   .meter {
+    --run: calc(44vh - 19px);
     left: auto;
-    right: calc(var(--gutter) * 0.55);
+    right: calc(var(--margin) / 2 - 11px);
     bottom: auto;
     top: 50%;
-    width: 24px;
-    height: 46vh;
-    transform: translateY(-58%);
+    width: 22px;
+    height: 44vh;
+    transform: translateY(-50%);
+  }
+  .meter::before {
+    display: none;
   }
   .meter__track {
-    left: auto;
-    right: 11px;
+    left: 10px;
+    right: auto;
     top: 0;
     bottom: 0;
     width: 1px;
     height: auto;
-    background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px 12px);
+    background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0 1px, transparent 1px 12px);
   }
-  .meter__rex {
-    left: auto;
-    right: -9px;
-    bottom: auto;
+  .meter__runner {
+    left: 1px;
     top: 0;
+    bottom: auto;
     width: 20px;
     height: 19px;
-    transform: translateY(calc(var(--p) * (46vh - 19px)));
+    transform: translate3d(0, calc(var(--p) * var(--run)), 0);
   }
   .meter__readout {
-    right: 0;
-    bottom: auto;
-    top: calc(100% + 20px);
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
-    width: 120px;
-    text-align: right;
+    display: contents;
   }
   .meter__num {
-    font-size: 1.75rem;
+    position: absolute;
+    top: calc(100% + 16px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
     line-height: 1;
   }
   .meter__unit {
-    display: block;
+    position: absolute;
+    top: calc(100% + 44px);
+    left: 50%;
+    transform: translateX(-50%);
   }
+  .meter__era {
+    position: absolute;
+    bottom: calc(100% + 16px);
+    left: 50%;
+    writing-mode: vertical-rl;
+    transform: translateX(-50%) rotate(180deg);
+    white-space: nowrap;
+  }
+}
+
+/* Pixel cactus: size = bitmap cells x --px */
+.cactus {
+  --px: 2px;
+  width: calc(var(--w) * var(--px));
+  height: calc(var(--h) * var(--px));
 }
 
 /* Pixel runner */
 .rex {
-  fill: var(--white);
+  fill: currentColor;
   overflow: visible;
+  transition: fill 0.5s var(--ease-out);
 }
 .rex__lid {
   fill: transparent;
 }
 .rex.is-blink .rex__lid {
-  fill: var(--white);
+  fill: currentColor;
 }
 .rex__legs {
   display: none;
@@ -376,40 +516,83 @@ button {
 .rex[data-pose='run2'] .rex__legs--run2 {
   display: inline;
 }
-.rex[data-dir='back'] {
-  scale: -1 1;
+/* Below 1024px the sprite faces its direction of travel. */
+.meter__rex[data-dir='back'] {
+  transform: scaleX(-1);
 }
-@media (min-width: 960px) {
-  /* On the vertical gauge the runner always faces the text. */
+@media (min-width: 1024px) {
+  /* On the vertical gauge it always faces the page. */
   .meter__rex,
   .meter__rex[data-dir='back'] {
-    scale: -1 1;
+    transform: scaleX(-1);
   }
 }
 
-/* ---------- Shared ASCII specimen layers ---------- */
-.specimen-ascii {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
+/* Light chapters: fixed UI switches to dark ink, each piece judged by
+   the chapter under its own position. */
+.is-light-top .nav {
+  color: var(--black);
+}
+.is-light-top .nav::before {
+  opacity: 0;
+}
+.is-light-bottom .meter {
+  color: var(--black);
+}
+.is-light-bottom .meter__track {
+  background: rgba(0, 0, 0, 0.3);
+}
+.is-light-bottom .meter::before {
+  background: linear-gradient(0deg, rgba(255, 255, 255, 0.94) 30%, transparent);
+}
+.is-light-bottom .meter__readout {
+  color: rgba(0, 0, 0, 0.6);
+}
+@media (min-width: 1024px) {
+  .is-light-bottom .meter {
+    color: var(--white);
+  }
+  .is-light-bottom .meter__readout,
+  .is-light-bottom .meter__unit,
+  .is-light-bottom .meter__era {
+    color: var(--ink-faint);
+  }
+  .is-light .meter,
+  .is-light.is-light-bottom .meter {
+    color: var(--black);
+  }
+  .is-light .meter__track,
+  .is-light.is-light-bottom .meter__track {
+    background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0 1px, transparent 1px 12px);
+  }
+  .is-light .meter__unit,
+  .is-light .meter__era {
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* While the intro plays, the fixed UI waits. */
+.is-intro .nav,
+.is-intro .meter {
+  opacity: 0;
 }
 
 /* ---------- Footer ---------- */
 .footer {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12vh var(--gutter) calc(64px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--rule);
-  margin: 0 var(--gutter);
-  padding-left: 0;
-  padding-right: 0;
+  row-gap: 8px;
+  padding-block: 12vh calc(72px + env(safe-area-inset-bottom));
+}
+
+.footer::before {
+  content: '';
+  grid-column: 1 / -1;
+  height: 1px;
+  margin-bottom: 32px;
+  background: var(--rule);
 }
 
 .footer__mark {
+  grid-column: 1 / -1;
   font-family: var(--font-display);
   font-size: 1.5rem;
   letter-spacing: 0.02em;
@@ -417,29 +600,92 @@ button {
 }
 
 .footer__note {
+  grid-column: 1 / -1;
+  max-width: 48ch;
   font-size: 0.8125rem;
   color: var(--ink-faint);
-  max-width: 48ch;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 1024px) {
   .footer {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: baseline;
     padding-bottom: 48px;
-    margin-right: calc(var(--gutter) + 72px);
+  }
+  .footer__mark {
+    grid-column: 1 / 7;
+  }
+  .footer__note {
+    grid-column: 8 / 13;
+    justify-self: end;
+    text-align: right;
+  }
+}
+
+/* ---------- Grid overlay (press G) ---------- */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  pointer-events: none;
+}
+
+.grid-overlay__cols {
+  height: 100%;
+}
+
+.grid-overlay__cols span {
+  background: rgba(201, 154, 85, 0.1);
+  box-shadow:
+    inset 1px 0 rgba(201, 154, 85, 0.5),
+    inset -1px 0 rgba(201, 154, 85, 0.5);
+}
+
+.grid-overlay__cols span:nth-child(n + 5) {
+  display: none;
+}
+
+.grid-overlay__label {
+  position: fixed;
+  left: var(--margin);
+  top: calc(var(--nav-h) + 8px);
+  padding: 4px 8px;
+  background: var(--black);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+}
+.grid-overlay__label::after {
+  content: '4 cols / 12px gap / 16px margin';
+}
+
+@media (min-width: 600px) {
+  .grid-overlay__cols span:nth-child(n + 5) {
+    display: block;
+  }
+  .grid-overlay__cols span:nth-child(n + 9) {
+    display: none;
+  }
+  .grid-overlay__label::after {
+    content: '8 cols / 20px gap / 32px margin';
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-overlay__cols span:nth-child(n + 9) {
+    display: block;
+  }
+  .grid-overlay__label::after {
+    content: '12 cols / 24px gap / 4vw margin';
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .specimen-ascii {
+  .specimen-ascii,
+  .senses__pixels {
     display: none;
   }
-  .print {
-    transition: none;
-  }
-  .nav {
+  .print,
+  .nav,
+  .meter {
     transition: none;
   }
 }

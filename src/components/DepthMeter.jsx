@@ -1,13 +1,15 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '../lib/gsap'
+import { eraOf } from '../data/content'
 import { PixelRex } from './sprites'
 
 // Maps scroll depth to geological time. Sections carry `data-mya` markers and
-// the readout interpolates between them, so the number only moves where the
-// story moves through time.
-const eraOf = (m) =>
-  m < 0.5 ? 'Today' : m < 2.58 ? 'Quaternary' : m < 23 ? 'Neogene' : m < 66 ? 'Paleogene' : m < 100.5 ? 'Late Cretaceous' : m < 145 ? 'Early Cretaceous' : 'Late Jurassic'
-
+// the readout interpolates between them.
+//
+// The runner's position and its facing are kept on separate elements: the
+// wrapper is translated by scroll progress, the sprite inside only flips. A
+// flip applied on the same element as the translate would mirror its position
+// too, which is what made it drift below 1024px.
 export default function DepthMeter() {
   const ref = useRef(null)
 
@@ -20,13 +22,20 @@ export default function DepthMeter() {
     let shown = -1
     let shownEra = ''
 
+    const track = el.querySelector('.meter__track')
+    const runner = el.querySelector('.meter__runner')
     const build = () => {
+      // Travel distance measured from the real track, so scrollbars or safe
+      // areas can never push the runner past its end.
+      const vertical = track.clientHeight > track.clientWidth
+      const run = vertical ? track.clientHeight - runner.offsetHeight : track.clientWidth - runner.offsetWidth
+      el.style.setProperty('--run', `${Math.max(0, run)}px`)
       stops = [...document.querySelectorAll('[data-mya]')]
         .map((n) => ({ y: n.getBoundingClientRect().top + window.scrollY, v: Number(n.dataset.mya) }))
         .sort((a, b) => a.y - b.y)
     }
 
-    const update = () => {
+    const readout = () => {
       const probe = window.scrollY + window.innerHeight * 0.5
       let v = 0
       if (stops.length) {
@@ -53,30 +62,39 @@ export default function DepthMeter() {
         era.textContent = e
         shownEra = e
       }
-      const max = ScrollTrigger.maxScroll(window) || 1
-      el.style.setProperty('--p', Math.min(1, window.scrollY / max).toFixed(4))
     }
 
-    const onRefresh = () => {
-      build()
-      update()
-    }
-    ScrollTrigger.addEventListener('refresh', onRefresh)
-    ScrollTrigger.create({ start: 0, end: 'max', onUpdate: update })
-    onRefresh()
+    // Progress is ScrollTrigger's own 0..1 for the whole document, so the
+    // runner is a pure function of scroll position in both directions.
+    const setP = (p) => el.style.setProperty('--p', Math.min(1, Math.max(0, p)).toFixed(4))
+    const st = ScrollTrigger.create({
+      start: 0,
+      end: 'max',
+      onUpdate: (self) => {
+        setP(self.progress)
+        readout()
+      },
+      onRefresh: (self) => {
+        build()
+        setP(self.progress)
+        readout()
+      },
+    })
+    build()
+    setP(st.progress)
+    readout()
 
-    if (prefersReducedMotion()) return () => ScrollTrigger.removeEventListener('refresh', onRefresh)
+    if (prefersReducedMotion()) return
 
-    // The runner: legs cycle while scrolling, it faces the scroll direction,
-    // and blinks now and then when left standing.
-    let lastY = window.scrollY
+    // Legs cycle while scrolling, the sprite faces the direction of travel,
+    // and it blinks now and then when left standing.
     let acc = 0
     let still = 0
     let frame = 0
+    let dir = 'fwd'
     const tick = (time, dt) => {
-      const dy = window.scrollY - lastY
-      lastY = window.scrollY
-      if (Math.abs(dy) > 0.4) {
+      const v = st.getVelocity()
+      if (Math.abs(v) > 20) {
         still = 0
         acc += dt
         if (acc > 95) {
@@ -84,28 +102,27 @@ export default function DepthMeter() {
           frame ^= 1
           rex.dataset.pose = frame ? 'run1' : 'run2'
         }
-        rex.dataset.dir = dy < 0 ? 'back' : 'fwd'
-      } else if ((still += dt) > 120) {
+        const d = v < 0 ? 'back' : 'fwd'
+        if (d !== dir) rex.dataset.dir = dir = d
+      } else if ((still += dt) > 140) {
         if (rex.dataset.pose !== 'stand') rex.dataset.pose = 'stand'
         rex.classList.toggle('is-blink', time % 3.6 < 0.14)
       }
     }
     gsap.ticker.add(tick)
-
-    return () => {
-      gsap.ticker.remove(tick)
-      ScrollTrigger.removeEventListener('refresh', onRefresh)
-    }
+    return () => gsap.ticker.remove(tick)
   })
 
   return (
     <aside ref={ref} className="meter" aria-hidden="true">
       <div className="meter__track">
-        <PixelRex className="meter__rex" />
+        <div className="meter__runner">
+          <PixelRex className="meter__rex" />
+        </div>
       </div>
       <p className="meter__readout">
         <span className="meter__num">000</span>
-        <span className="meter__unit">million years ago</span>
+        <span className="meter__unit">mya</span>
         <span className="meter__era">Today</span>
       </p>
     </aside>

@@ -6,7 +6,6 @@ import '@fontsource/ibm-plex-sans/500.css'
 import '@fontsource/ibm-plex-mono/400.css'
 import 'lenis/dist/lenis.css'
 import './styles/global.css'
-import './styles/hero.css'
 import './styles/sections.css'
 import App from './App.jsx'
 
