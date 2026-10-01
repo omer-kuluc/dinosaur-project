@@ -315,7 +315,7 @@
 
   .hero__title {
     grid-column: 1 / 10;
-    font-size: 11vw;
+    font-size: 10.5vw;
   }
 
   .hero__sub {
@@ -1196,6 +1196,7 @@
 }
 
 .closing__kicker {
+  color: #c79954;
   max-width: 22ch;
   margin-top: 44px;
   font-size: clamp(1.5rem, 6vw, 2.25rem);
@@ -1218,9 +1219,9 @@
 }
 
 .closing__action:hover {
-  background: var(--white);
-  border-color: var(--white);
-  color: var(--black);
+  background: #c79954;
+  border-color: var(--black);
+  color: var(--white);
 }
 
 .closing__action:active {
