@@ -37,6 +37,7 @@ export default function Hero() {
           preview,
           cols: desktop ? 104 : 60,
           clip: { from: 'bottom', bars: desktop ? 18 : 12, steps: 22, skew: 0.5, seed: 11 },
+          clearRevealed: true,
         })
 
         // Entrance and scroll share one state so they never fight.

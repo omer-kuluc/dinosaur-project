@@ -6,7 +6,7 @@ import { headingLines, bodyLines, scrambleIn } from '../lib/text'
 import { scrollToTarget } from '../lib/scroll'
 import { CLOSING, img } from '../data/content'
 import Picture from './Picture'
-import DigSite, { revealDig } from './DigSite'
+import DigSite from './DigSite'
 
 // The bookend: the last specimen decodes out of the ASCII ground exactly like
 // the first one did, and the headline overlaps it on a shared plane.
@@ -36,7 +36,6 @@ export default function Closing() {
         const s = { decode: 0, reveal: 0 }
         const apply = () => spec.set(s)
         apply()
-        revealDig(q('.dig')[0])
 
         gsap
           .timeline({ scrollTrigger: desktop ? { trigger: frame, start: 'top 85%', end: 'top 20%', scrub: 0.6 } : { trigger: frame, start: 'top 78%', once: true } })

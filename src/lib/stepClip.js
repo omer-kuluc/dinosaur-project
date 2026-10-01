@@ -14,10 +14,9 @@ function hash1(i, seed) {
 
 const f = (n) => `${n.toFixed(2)}%`
 
-export function stepClip(p, { bars = 14, steps = 18, from = 'top', skew = 0.55, flip = false, seed = 3, jitter = 0.22 } = {}) {
-  if (p <= 0) return 'polygon(0% 0%, 0% 0%, 0% 0%)'
-  if (p >= 1) return 'none'
-
+// How far each strip has grown (0..100 percent) at progress p. Shared with the
+// ASCII layer so it knows which cells the photograph already covers.
+export function stepBars(p, { bars = 14, steps = 18, skew = 0.55, flip = false, seed = 3, jitter = 0.22 } = {}) {
   const span = 1 + skew + jitter
   const vals = new Array(bars)
   for (let i = 0; i < bars; i++) {
@@ -26,6 +25,14 @@ export function stepClip(p, { bars = 14, steps = 18, from = 'top', skew = 0.55, 
     const q = Math.min(1, Math.max(0, local))
     vals[i] = (Math.ceil(q * steps) / steps) * 100
   }
+  return vals
+}
+
+export function stepClip(p, { bars = 14, steps = 18, from = 'top', skew = 0.55, flip = false, seed = 3, jitter = 0.22 } = {}) {
+  if (p <= 0) return 'polygon(0% 0%, 0% 0%, 0% 0%)'
+  if (p >= 1) return 'none'
+
+  const vals = stepBars(p, { bars, steps, skew, flip, seed, jitter })
 
   const pts = []
   const edge = (i) => (i / bars) * 100

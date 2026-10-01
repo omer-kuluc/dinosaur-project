@@ -513,23 +513,6 @@
   left: 10%;
 }
 
-.dig__square {
-  position: absolute;
-  inset: 0;
-  border: 1px dashed rgba(255, 255, 255, 0.24);
-}
-
-.dig__bones {
-  position: absolute;
-  left: 10px;
-  top: 7px;
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  line-height: 1.15;
-  color: rgba(255, 255, 255, 0.64);
-  transform: rotate(-4deg);
-}
-
 .dig__anchor {
   left: 50%;
   top: -10px;
@@ -540,12 +523,6 @@
     width: 156px;
     height: 68px;
     bottom: calc(100% + 22px);
-  }
-
-  .dig__bones {
-    left: 14px;
-    top: 10px;
-    font-size: 10.5px;
   }
 }
 

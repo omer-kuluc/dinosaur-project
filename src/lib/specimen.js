@@ -1,5 +1,5 @@
 import { createAtlas, fontsReady } from './ascii'
-import { stepClip } from './stepClip'
+import { stepClip, stepBars } from './stepClip'
 
 // The signature move, used on the first and last image only.
 // The image is first "decoded" as ASCII sampled from its own light and shadow,
@@ -34,7 +34,7 @@ const whenLoaded = (el) =>
         el.addEventListener('error', res, { once: true })
       })
 
-export function createSpecimen({ frame, layers, canvas, preview, cols = 84, clip = {}, posX = 0.5, posY = 0.5 }) {
+export function createSpecimen({ frame, layers, canvas, preview, cols = 84, clip = {}, posX = 0.5, posY = 0.5, clearRevealed = false }) {
   const ctx = canvas.getContext('2d')
   const state = { decode: 0, reveal: 0, crumble: 0 }
   let ready = false
@@ -137,6 +137,19 @@ export function createSpecimen({ frame, layers, canvas, preview, cols = 84, clip
     const c2 = crumble * crumble
     const fallPx = H * 0.55 * dpr
 
+    // Entrance only (no crumble): characters vanish as soon as the photograph
+    // block above them is revealed, so none linger around the subject.
+    const vals = clearRevealed && crumble <= 0 && photoReady && state.reveal > 0 ? stepBars(state.reveal, clip) : null
+    const bars = clip.bars ?? 14
+    const from = clip.from || 'top'
+    const covered = (x, y) => {
+      const vertical = from === 'top' || from === 'bottom'
+      const bi = Math.min(bars - 1, Math.floor(((vertical ? x + 0.5 : y + 0.5) / (vertical ? cols : rows)) * bars))
+      const along =
+        from === 'bottom' ? (rows - y - 0.5) / rows : from === 'top' ? (y + 0.5) / rows : from === 'left' ? (x + 0.5) / cols : (cols - x - 0.5) / cols
+      return along * 100 <= vals[bi]
+    }
+
     for (let y = 0; y < rows; y++) {
       const baseY = y * cellH * dpr
       for (let x = 0; x < cols; x++) {
@@ -145,6 +158,7 @@ export function createSpecimen({ frame, layers, canvas, preview, cols = 84, clip
         if (!c) continue
         const t0 = thr[i]
         if (t0 > D) continue
+        if (vals && covered(x, y)) continue
         let t = toneIdx[i]
         if (scrambling && D - t0 < 0.22) {
           c = 1 + ((Math.random() * (RAMP.length - 1)) | 0)

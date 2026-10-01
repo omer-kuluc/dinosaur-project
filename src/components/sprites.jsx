@@ -58,9 +58,6 @@ const PRINT = [
 export const PRINT_D = toPath(PRINT)
 export const PRINT_SIZE = 9
 
-// ASCII furniture.
-export const BONES = [' .-.       .-.', '(   )=====(   )', " '-'       '-'", '    []-[]-[]-[]'].join('\n')
-
 const CACTI = {
   tall: [
     '....##....',

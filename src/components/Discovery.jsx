@@ -3,7 +3,7 @@ import { gsap, useGSAP, MQ } from '../lib/gsap'
 import { headingLines, bodyLines, scrambleIn } from '../lib/text'
 import { DISCOVERY, img } from '../data/content'
 import Picture from './Picture'
-import DigSite, { revealDig } from './DigSite'
+import DigSite from './DigSite'
 
 // A display case opening: the image appears through a horizontal slit that
 // widens top and bottom while the photograph settles from a slight zoom.
@@ -23,7 +23,6 @@ export default function Discovery() {
         const { desktop, reduce } = ctx.conditions
         if (reduce) return
 
-        revealDig(q('.dig')[0])
         const slit = { clipPath: 'inset(49.5% 0% 49.5% 0%)' }
         const open = { clipPath: 'inset(0% 0% 0% 0%)' }
 

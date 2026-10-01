@@ -55,7 +55,7 @@ export const SENSES = {
     { figure: 'Low Hz', label: 'Hearing', text: 'A long cochlea suggests hearing tuned to deep, low-frequency sound.' },
   ],
   cite: 'After Stevens 2006, Witmer and Ridgely 2009, Zelenitsky et al. 2009',
-  alt: 'Pixel-dithered Tyrannosaurus rex roaring through a misty forest, its eye in focus.',
+  alt: 'Tyrannosaurus rex head facing right in the dark, its eye glowing amber.',
 }
 
 export const BITE = {
@@ -103,7 +103,7 @@ export const CLOSING = {
   body: 'Some eighty million years before T. rex, Allosaurus hunted the floodplains of the Late Jurassic. Both were theropods, the two-legged branch of dinosaurs that never fully disappeared.',
   kicker: 'Every bird you have ever seen is a theropod.',
   cite: 'Allosaurus fragilis, Morrison Formation, 155 to 145 million years ago',
-  alt: 'Pixel-dithered Allosaurus standing in profile against a stormy sky.',
+  alt: 'A slender theropod standing on a lit floor, head turned over its shoulder.',
   action: 'Return to the surface',
 }
 
