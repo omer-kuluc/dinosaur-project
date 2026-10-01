@@ -60,7 +60,7 @@ export default function Hero() {
         introDone.then(() => intro.play())
 
         // Pointer depth: the subject drifts against the still headline.
-        let offPointer = () => {}
+        let offPointer = () => { }
         if (desktop && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
           const dx = gsap.quickTo(layer, 'x', { duration: 1.6, ease: 'power3.out' })
           const dy = gsap.quickTo(layer, 'y', { duration: 1.6, ease: 'power3.out' })
@@ -106,7 +106,7 @@ export default function Hero() {
       <div className="hero__stage grid">
         <h1 className="hero__title" id="hero-title" aria-label="T-Rex: Engineered by Evolution">
           <span className="line-mask" aria-hidden="true">
-            <span className="line">{l1}</span>
+            <span className="line t-rex-line">{l1}</span>
           </span>
           <span className="line-mask" aria-hidden="true">
             <span className="line">{l2}</span>
