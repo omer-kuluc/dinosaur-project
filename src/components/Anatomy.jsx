@@ -10,8 +10,12 @@ import Picture from './Picture'
 export default function Anatomy() {
   const root = useRef(null)
   const image = img(ANATOMY.image)
-  // The lettering is filled with the same photograph (a mid-size rendition).
-  const fill = { backgroundImage: `image-set(url("/img/specimen-${ANATOMY.image}-1024.avif") type("image/avif"), url("/img/specimen-${ANATOMY.image}-1024.webp") type("image/webp"))` }
+  // The lettering is filled with the same photograph: 1440 on standard screens,
+  // 2000 on high-density ones (usually the same file the photo below loads).
+  const src = (w, ext) => `url("/img/specimen-${ANATOMY.image}-${w}.${ext}") type("image/${ext}")`
+  const fill = {
+    backgroundImage: `image-set(${src(1440, 'avif')} 1x, ${src(1440, 'webp')} 1x, ${src(2000, 'avif')} 2x, ${src(2000, 'webp')} 2x)`,
+  }
 
   useGSAP(
     () => {
@@ -71,7 +75,14 @@ export default function Anatomy() {
     <section ref={root} id="anatomy" className="anatomy" data-bg="#122624" aria-labelledby="anatomy-title">
       <div className="anatomy__stage">
         <div className="anatomy__view">
-          <Picture data={image} sizes="100vw" alt={ANATOMY.alt} className="anatomy__color" />
+          {/* Cover-fit: phones use a 4:5 frame (~165vw wide), desktop fills the screen
+              (~132vh wide when the screen is narrower than 4:3), otherwise full width. */}
+          <Picture
+            data={image}
+            sizes="(max-width: 599px) 165vw, (min-width: 1024px) and (max-aspect-ratio: 4/3) 132vh, 100vw"
+            alt={ANATOMY.alt}
+            className="anatomy__color"
+          />
         </div>
         <p className="anatomy__word" style={fill} aria-hidden="true">
           <span className="anatomy__letters">{ANATOMY.word}</span>
