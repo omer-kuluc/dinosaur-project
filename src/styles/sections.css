@@ -251,16 +251,6 @@
   gap: 0.22em;
 }
 
-.hero__sub {
-  max-width: 17ch;
-  font-family: var(--font-text);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  line-height: 1.3;
-  letter-spacing: 0;
-  color: var(--ink-soft);
-}
-
 .hero__media {
   position: absolute;
   z-index: 2;
@@ -295,9 +285,6 @@
     font-size: 17vw;
   }
 
-  .hero__sub {
-    font-size: 0.875rem;
-  }
 
   .hero__media {
     left: auto;
@@ -318,10 +305,7 @@
     font-size: 10.5vw;
   }
 
-  .hero__sub {
-    max-width: 19ch;
-    font-size: 0.9375rem;
-  }
+
 
   .hero__media {
     right: -5.5vw;

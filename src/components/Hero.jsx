@@ -47,7 +47,6 @@ export default function Hero() {
 
         const split = SplitText.create(lines, { type: 'chars' })
         gsap.set(split.chars, { yPercent: 115 })
-        gsap.set(q('.hero__sub'), { autoAlpha: 0 })
 
         // Headline first: the letters rise while their tracking settles; the
         // specimen then decodes in front of them and resolves into the photo.
@@ -57,7 +56,6 @@ export default function Hero() {
           .fromTo(title, { letterSpacing: '0.05em' }, { letterSpacing: '-0.02em', duration: 2.2, ease: 'expo.out' }, 0.1)
           .to(s, { decode: 1, duration: 1.2, ease: 'power2.out', onUpdate: apply }, 0.55)
           .to(s, { rise: 1, duration: 1.5, ease: 'power2.inOut', onUpdate: apply }, 1.05)
-          .fromTo(q('.hero__sub'), { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'expo.out' }, 1.4)
         introDone.then(() => intro.play())
 
         // Pointer depth: the subject drifts against the still headline.
@@ -88,7 +86,6 @@ export default function Hero() {
           .to(s, { sink: 1, duration: 0.8, ease: 'none', onUpdate: apply }, 0.2)
           .to(q('.hero__sink'), { yPercent: 26, duration: 0.8, ease: 'power1.in' }, 0.2)
           .to(lines, { yPercent: 118, duration: 0.45, ease: 'power2.in', stagger: 0.07 }, 0.22)
-          .to(q('.hero__sub'), { autoAlpha: 0, duration: 0.2, ease: 'power1.in' }, 0.12)
 
         return () => {
           offPointer()
@@ -114,7 +111,6 @@ export default function Hero() {
           </span>
           <span className="line-mask hero__row" aria-hidden="true">
             <span className="line">{l3}</span>
-            <span className="hero__sub">{HERO.sub}</span>
           </span>
           <span className="line-mask" aria-hidden="true">
             <span className="line">{l4}</span>
