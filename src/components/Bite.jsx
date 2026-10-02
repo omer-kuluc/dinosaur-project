@@ -70,7 +70,9 @@ export default function Bite() {
   return (
     <section ref={root} id="bite" className="bite" data-bg="#000000" aria-labelledby="bite-title">
       <div className="bite__frame">
-        <Picture data={image} sizes="100vw" alt={BITE.alt} />
+        {/* Full-bleed cover: on screens narrower than the image (5:4) it is sized by
+            height, so it renders ~125vh wide; on wider screens it is 100vw. */}
+        <Picture data={image} sizes="(max-aspect-ratio: 5/4) 125vh, 100vw" alt={BITE.alt} />
       </div>
       <div className="bite__scrim" aria-hidden="true" />
       <div className="bite__copy grid">
