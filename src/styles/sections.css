@@ -733,6 +733,7 @@
 }
 
 @media (min-width: 1024px) {
+
   /* Landscape shows the full width; sit high so the skull stays whole. */
   .bite__frame picture,
   .bite__frame img {
