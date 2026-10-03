@@ -76,8 +76,9 @@ export default function Hero() {
             scrollTrigger: {
               trigger: root.current,
               start: 'top top',
-              end: desktop ? '+=80%' : 'bottom top',
-              pin: desktop,
+              // Pinned on every screen so the sink plays while the specimen is in view.
+              end: desktop ? '+=80%' : '+=70%',
+              pin: true,
               scrub: desktop ? 0.6 : 0.4,
               anticipatePin: 1,
             },

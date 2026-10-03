@@ -37,10 +37,12 @@ export default function Closing() {
         const apply = () => spec.set(s)
         apply()
 
+        // Scroll-driven on every screen; the taller phone frame starts a little
+        // lower and finishes higher so the build-up spans its full height.
         gsap
-          .timeline({ scrollTrigger: desktop ? { trigger: frame, start: 'top 85%', end: 'top 20%', scrub: 0.6 } : { trigger: frame, start: 'top 78%', once: true } })
-          .to(s, { decode: 1, duration: desktop ? 0.5 : 0.9, ease: 'power1.out', onUpdate: apply }, 0)
-          .to(s, { reveal: 1, duration: desktop ? 0.62 : 1.2, ease: 'power1.inOut', onUpdate: apply }, desktop ? 0.38 : 0.55)
+          .timeline({ scrollTrigger: { trigger: frame, start: desktop ? 'top 85%' : 'top 90%', end: desktop ? 'top 20%' : 'top 15%', scrub: 0.6 } })
+          .to(s, { decode: 1, duration: 0.5, ease: 'power1.out', onUpdate: apply }, 0)
+          .to(s, { reveal: 1, duration: 0.62, ease: 'power1.inOut', onUpdate: apply }, 0.38)
 
         headingLines(q('.closing__title')[0], desktop ? { scrub: true, start: 'top 82%', end: 'top 40%' } : {})
         bodyLines(q('.closing__body')[0])

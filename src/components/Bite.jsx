@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { gsap, SplitText, useGSAP, MQ } from '../lib/gsap'
 import { jawClip } from '../lib/stepClip'
-import { bodyLines, scrambleIn } from '../lib/text'
+import { scrambleIn } from '../lib/text'
 import { BITE, img } from '../data/content'
 import Picture from './Picture'
 
@@ -34,27 +34,20 @@ export default function Bite() {
 
         const split = SplitText.create(figure, { type: 'chars' })
         gsap.set(split.chars, { yPercent: 110 })
-        const restores = [scrambleIn(q('.numeral')[0], { trigger: root.current, start: desktop ? 'top top' : 'top 60%', duration: 0.8 })]
+        const restores = [scrambleIn(q('.numeral')[0], { trigger: root.current, start: 'top top', duration: 0.8 })]
 
-        if (desktop) {
-          gsap
-            .timeline({ scrollTrigger: { trigger: root.current, start: 'top top', end: '+=180%', pin: true, scrub: 0.6, anticipatePin: 1 } })
-            .to(j, { p: 1, duration: 0.45, ease: 'power2.inOut', onUpdate: bite }, 0)
-            .fromTo(photo, { scale: 1.25 }, { scale: 1, duration: 0.6, ease: 'power1.out' }, 0)
-            .to(split.chars, { yPercent: 0, duration: 0.3, stagger: 0.03, ease: 'power3.out' }, 0.42)
-            .from(q('.bite__title'), { yPercent: 60, opacity: 0, duration: 0.2, ease: 'power2.out' }, 0.5)
-            .from(q('.bite__body, .bite__detail'), { y: 24, opacity: 0, duration: 0.25, stagger: 0.06, ease: 'power2.out' }, 0.62)
-            .to({}, { duration: 0.15 })
-        } else {
-          gsap
-            .timeline({ scrollTrigger: { trigger: root.current, start: 'top 65%', once: true } })
-            .to(j, { p: 1, duration: 1.5, ease: 'power3.inOut', onUpdate: bite }, 0)
-            .fromTo(photo, { scale: 1.25 }, { scale: 1, duration: 2, ease: 'expo.out' }, 0)
-          gsap.to(split.chars, { yPercent: 0, duration: 1.1, stagger: 0.04, ease: 'expo.out', scrollTrigger: { trigger: figure, start: 'top 85%', once: true } })
-          bodyLines(q('.bite__body')[0])
-        }
+        // One pinned, scroll-driven sequence on every screen; phones and tablets
+        // use a shorter scroll distance for the same choreography.
+        gsap
+          .timeline({ scrollTrigger: { trigger: root.current, start: 'top top', end: desktop ? '+=180%' : '+=150%', pin: true, scrub: 0.6, anticipatePin: 1 } })
+          .to(j, { p: 1, duration: 0.45, ease: 'power2.inOut', onUpdate: bite }, 0)
+          .fromTo(photo, { scale: 1.25 }, { scale: 1, duration: 0.6, ease: 'power1.out' }, 0)
+          .to(split.chars, { yPercent: 0, duration: 0.3, stagger: 0.03, ease: 'power3.out' }, 0.42)
+          .from(q('.bite__title'), { yPercent: 60, opacity: 0, duration: 0.2, ease: 'power2.out' }, 0.5)
+          .from(q('.bite__body, .bite__detail'), { y: 24, opacity: 0, duration: 0.25, stagger: 0.06, ease: 'power2.out' }, 0.62)
+          .to({}, { duration: 0.15 })
 
-        restores.push(scrambleIn(q('.cite')[0], { trigger: desktop ? root.current : q('.cite')[0], start: desktop ? 'top -120%' : 'top 95%', duration: 1.4 }))
+        restores.push(scrambleIn(q('.cite')[0], { trigger: root.current, start: desktop ? 'top -120%' : 'top -100%', duration: 1.4 }))
         return () => {
           frame.style.clipPath = ''
           frame.style.webkitClipPath = ''

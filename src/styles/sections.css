@@ -27,12 +27,9 @@
   inset: 0 0 40% 0;
   opacity: 0.55;
   background-image:
-    radial-gradient(1px 1px at 12% 22%, #fff, transparent),
-    radial-gradient(1px 1px at 27% 8%, #fff, transparent),
-    radial-gradient(1px 1px at 44% 30%, #fff, transparent),
-    radial-gradient(1px 1px at 61% 14%, #fff, transparent),
-    radial-gradient(1px 1px at 78% 26%, #fff, transparent),
-    radial-gradient(1px 1px at 90% 9%, #fff, transparent),
+    radial-gradient(1px 1px at 12% 22%, #fff, transparent), radial-gradient(1px 1px at 27% 8%, #fff, transparent),
+    radial-gradient(1px 1px at 44% 30%, #fff, transparent), radial-gradient(1px 1px at 61% 14%, #fff, transparent),
+    radial-gradient(1px 1px at 78% 26%, #fff, transparent), radial-gradient(1px 1px at 90% 9%, #fff, transparent),
     radial-gradient(1.5px 1.5px at 70% 40%, var(--amber), transparent);
 }
 
@@ -172,47 +169,6 @@
   color: var(--white);
 }
 
-@media (min-width: 600px) {
-  .loader__num {
-    font-size: 34vw;
-  }
-
-  .loader__count {
-    top: 14svh;
-  }
-}
-
-@media (min-width: 1024px) {
-  .loader__num {
-    font-size: 25vw;
-  }
-
-  .loader__count {
-    top: 9svh;
-  }
-
-  .loader__label {
-    grid-column: 1 / 7;
-    margin-top: 28px;
-    font-size: 0.75rem;
-  }
-
-  .loader__ground {
-    top: 74svh;
-  }
-
-  .loader__runner {
-    top: calc(74svh + 64px - 13px - 44px);
-    width: 46px;
-    height: 44px;
-    left: calc(var(--margin) + 14vw);
-  }
-
-  .loader__cactus {
-    --px: 3px;
-  }
-}
-
 /* ---------------------------------------------------------------
    Hero: one stage for type and subject. A huge stacked headline on
    the flat ground; the cut-out dinosaur stands in front of it and
@@ -251,12 +207,19 @@
   gap: 0.22em;
 }
 
+/* Below 1024px the dinosaur is sized to the room left under the title
+   (4 lines at 0.84 line-height), minus the sink's 40px offset, so the two
+   never overlap; it stays at full size wherever that room allows. */
 .hero__media {
+  --title-bottom: calc(var(--nav-h) + 3svh + 4 * 0.84 * 21.5vw);
+  --room: calc(max(100svh, 600px) - var(--title-bottom) - 2svh - 40px - 64px - env(safe-area-inset-bottom));
+  --dino-w: min(162vw, var(--room) * 1024 / 712);
   position: absolute;
   z-index: 2;
-  left: -18vw;
+  /* Right-anchored so the body always exits off-screen (44 of 162 parts). */
+  right: calc(var(--dino-w) * -44 / 162);
   bottom: calc(64px + env(safe-area-inset-bottom));
-  width: 162vw;
+  width: var(--dino-w);
   aspect-ratio: 1024 / 712;
   pointer-events: none;
 }
@@ -278,40 +241,6 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-@media (min-width: 600px) {
-  .hero__title {
-    font-size: 17vw;
-  }
-
-
-  .hero__media {
-    left: auto;
-    right: -12vw;
-    width: 108vw;
-    bottom: 4svh;
-  }
-}
-
-@media (min-width: 1024px) {
-  .hero__stage {
-    align-content: center;
-    padding-top: calc(var(--nav-h) * 0.6);
-  }
-
-  .hero__title {
-    grid-column: 1 / 10;
-    font-size: 10.5vw;
-  }
-
-
-
-  .hero__media {
-    right: -5.5vw;
-    bottom: -3svh;
-    width: 72vw;
-  }
 }
 
 /* ---------------------------------------------------------------
@@ -340,40 +269,6 @@
 .statement__out {
   bottom: 6vh;
   left: 62%;
-}
-
-@media (min-width: 600px) {
-  .statement__text {
-    font-size: 5.4vw;
-  }
-
-  .statement__note {
-    grid-column: 5 / -1;
-  }
-}
-
-@media (min-width: 1024px) {
-
-  /* Desktop only: pulled up into the emptied, pinned hero so the sink hands
-     straight over. Below 1024px the hero is not pinned, so no overlap. */
-  .statement {
-    margin-top: -48vh;
-  }
-
-  .statement__text {
-    grid-column: 2 / 12;
-    font-size: 4.3vw;
-    line-height: 1.08;
-  }
-
-  .statement__note {
-    grid-column: 9 / 13;
-    font-size: 1rem;
-  }
-
-  .statement__out {
-    left: 60%;
-  }
 }
 
 /* ---------------------------------------------------------------
@@ -432,52 +327,6 @@
   left: 26%;
 }
 
-@media (min-width: 600px) {
-  .discovery__media {
-    margin-inline: 0;
-  }
-
-  .discovery__facts {
-    grid-column: 1 / 5;
-  }
-
-  .discovery__text {
-    grid-column: 5 / -1;
-  }
-}
-
-@media (min-width: 1024px) {
-  .discovery {
-    row-gap: 56px;
-    padding-block: 26vh 24vh;
-  }
-
-  .discovery__head {
-    grid-column: 2 / 10;
-  }
-
-  .discovery__title {
-    font-size: 8vw;
-  }
-
-  .discovery__media {
-    grid-column: 2 / 12;
-    margin-top: 96px;
-  }
-
-  .discovery__facts {
-    grid-column: 2 / 6;
-  }
-
-  .discovery__text {
-    grid-column: 7 / 12;
-  }
-
-  .discovery__body {
-    font-size: 1.0625rem;
-  }
-}
-
 /* ---------------------------------------------------------------
    Dig site
 ---------------------------------------------------------------- */
@@ -500,14 +349,6 @@
 .dig__anchor {
   left: 50%;
   top: -10px;
-}
-
-@media (min-width: 1024px) {
-  .dig {
-    width: 156px;
-    height: 68px;
-    bottom: calc(100% + 22px);
-  }
 }
 
 /* ---------------------------------------------------------------
@@ -603,46 +444,6 @@
   color: var(--ink-soft);
 }
 
-@media (min-width: 600px) {
-  .senses {
-    --panel: 52svh;
-  }
-}
-
-@media (min-width: 1024px) {
-  .senses {
-    --panel: 100vh;
-    padding-bottom: 20vh;
-  }
-
-  .senses__panel {
-    grid-column: 1 / 7;
-    margin-right: 0;
-    height: 100vh;
-  }
-
-  .senses__content {
-    grid-column: 8 / 13;
-    padding-top: 30vh;
-  }
-
-  .senses__head {
-    margin-bottom: 10vh;
-  }
-
-  .senses__title {
-    font-size: 6.4vw;
-  }
-
-  .sense {
-    min-height: 78vh;
-  }
-
-  .sense__figure {
-    font-size: 10.5vw;
-  }
-}
-
 /* ---------------------------------------------------------------
    The bite: full bleed, jaws open, one giant number
 ---------------------------------------------------------------- */
@@ -687,7 +488,7 @@
   align-items: end;
 }
 
-.bite__copy>* {
+.bite__copy > * {
   grid-column: 1 / -1;
 }
 
@@ -720,53 +521,6 @@
   margin-top: 10px;
   font-size: 0.875rem;
   color: var(--ink-faint);
-}
-
-@media (min-width: 600px) {
-  .bite__figure {
-    font-size: 20vw;
-  }
-
-  .bite__aside {
-    grid-column: 4 / -1;
-  }
-}
-
-@media (min-width: 1024px) {
-
-  /* Landscape shows the full width; sit high so the skull stays whole. */
-  .bite__frame picture,
-  .bite__frame img {
-    object-position: 50% 8%;
-  }
-
-  .bite__scrim {
-    background:
-      linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, transparent 55%),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, transparent 45%);
-  }
-
-  .bite__copy {
-    bottom: 7svh;
-  }
-
-  .bite__copy .numeral,
-  .bite__title {
-    grid-column: 1 / 7;
-  }
-
-  .bite__figure {
-    grid-column: 1 / 10;
-    grid-row: 3;
-    font-size: 18vw;
-  }
-
-  .bite__aside {
-    grid-column: 10 / 13;
-    grid-row: 3;
-    align-self: end;
-    margin: 0 0 1.4vw;
-  }
 }
 
 /* ---------------------------------------------------------------
@@ -913,88 +667,23 @@
   margin-top: 40px;
 }
 
-@media (min-width: 600px) {
-  .measures__figures {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .fig--lead .fig__num {
-    font-size: 30vw;
-  }
-}
-
-@media (min-width: 1024px) {
-  .measures {
-    padding-block: 28vh 24vh;
-  }
-
-  .measures__title {
-    grid-column: 1 / 9;
-    font-size: 7.6vw;
-  }
-
-  .measures__body {
-    grid-column: 1 / 6;
-    font-size: 1.0625rem;
-  }
-
-  .fig--lead {
-    grid-column: 1 / 9;
-    grid-row: 3;
-    margin-top: 12vh;
-  }
-
-  .fig--lead .fig__num {
-    font-size: 25vw;
-  }
-
-  .measures__figures {
-    grid-column: 9 / 13;
-    grid-row: 3;
-    align-self: end;
-    grid-template-columns: 1fr;
-    gap: 48px;
-    margin: 0 0 2vw;
-  }
-
-  .scale {
-    margin-top: 16vh;
-  }
-
-  .scale__row {
-    grid-template-columns: 120px 1fr;
-    gap: 24px;
-  }
-
-  .scale__track {
-    height: 16px;
-  }
-
-  .scale__ticks {
-    margin-left: 144px;
-  }
-
-  .scale__ticks .is-minor {
-    visibility: visible;
-  }
-
-  .measures__cite {
-    grid-column: 1 / 7;
-  }
-}
-
 /* ---------------------------------------------------------------
    Anatomy: through the word, then one opening window
 ---------------------------------------------------------------- */
-/* Phones read the word first, then the body. */
+/* One full-screen stage on every screen: the word sits over the image and
+   its letters show exactly the part of the photo behind them. */
 .anatomy__stage {
   position: relative;
-  display: flex;
-  flex-direction: column-reverse;
+  height: 100svh;
+  overflow: hidden;
 }
 
 .anatomy__word {
-  padding: 18vh var(--margin) 7vh;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-display);
   font-size: 31vw;
   line-height: 0.8;
@@ -1002,8 +691,9 @@
   text-align: center;
   text-transform: uppercase;
   color: transparent;
-  background-size: 150% auto;
-  background-position: 42% 48%;
+  /* Matches the photo's cover fit and object-position below. */
+  background-size: cover;
+  background-position: 34% 50%;
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.16);
   -webkit-background-clip: text;
   background-clip: text;
@@ -1011,8 +701,8 @@
 }
 
 .anatomy__view {
-  position: relative;
-  aspect-ratio: 4 / 5;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
 }
 
@@ -1041,7 +731,7 @@
   padding-block: 10vh 18vh;
 }
 
-.anatomy__copy>* {
+.anatomy__copy > * {
   grid-column: 1 / -1;
 }
 
@@ -1061,79 +751,6 @@
 .anatomy__out {
   bottom: 6vh;
   left: 70%;
-}
-
-@media (min-width: 600px) {
-  .anatomy__view {
-    aspect-ratio: 16 / 11;
-  }
-
-  .anatomy__body {
-    grid-column: 1 / 7;
-  }
-
-  .anatomy__copy .facts {
-    grid-column: 1 / 6;
-  }
-}
-
-@media (min-width: 1024px) {
-  .anatomy__stage {
-    display: block;
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  .anatomy__view {
-    position: absolute;
-    inset: 0;
-    aspect-ratio: auto;
-  }
-
-  .anatomy__color img {
-    object-position: 50% 50%;
-  }
-
-  .anatomy__word {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    font-size: 29vw;
-    background-size: cover;
-    background-position: 50% 50%;
-  }
-
-  .anatomy__copy {
-    padding-block: 14vh 22vh;
-    row-gap: 24px;
-  }
-
-  .anatomy__copy .numeral,
-  .anatomy__title {
-    grid-column: 1 / 7;
-  }
-
-  .anatomy__title {
-    font-size: 7vw;
-  }
-
-  .anatomy__body {
-    grid-column: 7 / 12;
-    grid-row: 2 / 4;
-    font-size: 1.0625rem;
-  }
-
-  .anatomy__copy .facts {
-    grid-column: 1 / 5;
-    grid-row: 3;
-  }
-
-  .anatomy__copy .cite {
-    grid-column: 7 / 12;
-  }
 }
 
 /* ---------------------------------------------------------------
@@ -1220,14 +837,395 @@
   transform: translateY(1px);
 }
 
-@media (min-width: 600px) {
+/* =============================================================
+   Tablet (600px and up)
+============================================================= */
+
+@media (width >= 600px) {
+  /* Intro */
+  .loader__num {
+    font-size: 34vw;
+  }
+
+  .loader__count {
+    top: 14svh;
+  }
+
+  /* Hero */
+  .hero__title {
+    font-size: 17vw;
+  }
+
+  .hero__media {
+    --title-bottom: calc(var(--nav-h) + 3svh + 4 * 0.84 * 17vw);
+    --room: calc(max(100svh, 600px) - var(--title-bottom) - 2svh - 40px - 4svh);
+    --dino-w: min(108vw, var(--room) * 1024 / 712);
+    left: auto;
+    right: -12vw;
+    width: var(--dino-w);
+    bottom: 4svh;
+  }
+
+  /* Statement */
+  .statement__text {
+    font-size: 5.4vw;
+  }
+
+  .statement__note {
+    grid-column: 5 / -1;
+  }
+
+  /* Discovery */
+  .discovery__media {
+    margin-inline: 0;
+  }
+
+  .discovery__facts {
+    grid-column: 1 / 5;
+  }
+
+  .discovery__text {
+    grid-column: 5 / -1;
+  }
+
+  /* Senses */
+  .senses {
+    --panel: 52svh;
+  }
+  /* The bite */
+  .bite__figure {
+    font-size: 20vw;
+  }
+
+  .bite__aside {
+    grid-column: 4 / -1;
+  }
+
+  /* The measure of Sue */
+  .measures__figures {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .fig--lead .fig__num {
+    font-size: 30vw;
+  }
+
+  /* Anatomy */
+
+  .anatomy__body {
+    grid-column: 1 / 7;
+  }
+
+  .anatomy__copy .facts {
+    grid-column: 1 / 6;
+  }
+
+  /* Relatives */
   .closing__media {
     grid-column: 3 / -1;
     margin-left: 0;
   }
 }
 
-@media (min-width: 1024px) {
+/* =============================================================
+   Desktop (1024px and up)
+============================================================= */
+
+@media (width >= 1024px) {
+  /* Intro */
+  .loader__num {
+    font-size: 25vw;
+  }
+
+  .loader__count {
+    top: 9svh;
+  }
+
+  .loader__label {
+    grid-column: 1 / 7;
+    margin-top: 28px;
+    font-size: 0.75rem;
+  }
+
+  .loader__ground {
+    top: 74svh;
+  }
+
+  .loader__runner {
+    top: calc(74svh + 64px - 13px - 44px);
+    width: 46px;
+    height: 44px;
+    left: calc(var(--margin) + 14vw);
+  }
+
+  .loader__cactus {
+    --px: 3px;
+  }
+
+  /* Hero */
+  .hero__stage {
+    align-content: center;
+    padding-top: calc(var(--nav-h) * 0.6);
+  }
+
+  .hero__title {
+    grid-column: 1 / 10;
+    font-size: 10.5vw;
+  }
+
+  .hero__media {
+    right: -5.5vw;
+    bottom: -3svh;
+    width: 72vw;
+  }
+
+  /* Statement */
+
+  /* Desktop only: pulled up into the emptied, pinned hero so the sink hands
+     straight over. Below 1024px the hero is not pinned, so no overlap. */
+  .statement {
+    margin-top: -48vh;
+  }
+
+  .statement__text {
+    grid-column: 2 / 12;
+    font-size: 4.3vw;
+    line-height: 1.08;
+  }
+
+  .statement__note {
+    grid-column: 9 / 13;
+    font-size: 1rem;
+  }
+
+  .statement__out {
+    left: 60%;
+  }
+
+  /* Discovery */
+  .discovery {
+    row-gap: 56px;
+    padding-block: 26vh 24vh;
+  }
+
+  .discovery__head {
+    grid-column: 2 / 10;
+  }
+
+  .discovery__title {
+    font-size: 8vw;
+  }
+
+  .discovery__media {
+    grid-column: 2 / 12;
+    margin-top: 96px;
+  }
+
+  .discovery__facts {
+    grid-column: 2 / 6;
+  }
+
+  .discovery__text {
+    grid-column: 7 / 12;
+  }
+
+  .discovery__body {
+    font-size: 1.0625rem;
+  }
+
+  /* Dig site */
+  .dig {
+    width: 156px;
+    height: 68px;
+    bottom: calc(100% + 22px);
+  }
+  /* Senses */
+  .senses {
+    --panel: 100vh;
+    padding-bottom: 20vh;
+  }
+
+  .senses__panel {
+    grid-column: 1 / 7;
+    margin-right: 0;
+    height: 100vh;
+  }
+
+  .senses__content {
+    grid-column: 8 / 13;
+    padding-top: 30vh;
+  }
+
+  .senses__head {
+    margin-bottom: 10vh;
+  }
+
+  .senses__title {
+    font-size: 6.4vw;
+  }
+
+  .sense {
+    min-height: 78vh;
+  }
+
+  .sense__figure {
+    font-size: 10.5vw;
+  }
+
+  /* The bite */
+
+  /* Landscape shows the full width; sit high so the skull stays whole. */
+  .bite__frame picture,
+  .bite__frame img {
+    object-position: 50% 8%;
+  }
+
+  .bite__scrim {
+    background:
+      linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, transparent 55%),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, transparent 45%);
+  }
+
+  .bite__copy {
+    bottom: 7svh;
+  }
+
+  .bite__copy .numeral,
+  .bite__title {
+    grid-column: 1 / 7;
+  }
+
+  .bite__figure {
+    grid-column: 1 / 10;
+    grid-row: 3;
+    font-size: 18vw;
+  }
+
+  .bite__aside {
+    grid-column: 10 / 13;
+    grid-row: 3;
+    align-self: end;
+    margin: 0 0 1.4vw;
+  }
+
+  /* The measure of Sue */
+  .measures {
+    padding-block: 28vh 24vh;
+  }
+
+  .measures__title {
+    grid-column: 1 / 9;
+    font-size: 7.6vw;
+  }
+
+  .measures__body {
+    grid-column: 1 / 6;
+    font-size: 1.0625rem;
+  }
+
+  .fig--lead {
+    grid-column: 1 / 9;
+    grid-row: 3;
+    margin-top: 12vh;
+  }
+
+  .fig--lead .fig__num {
+    font-size: 25vw;
+  }
+
+  .measures__figures {
+    grid-column: 9 / 13;
+    grid-row: 3;
+    align-self: end;
+    grid-template-columns: 1fr;
+    gap: 48px;
+    margin: 0 0 2vw;
+  }
+
+  .scale {
+    margin-top: 16vh;
+  }
+
+  .scale__row {
+    grid-template-columns: 120px 1fr;
+    gap: 24px;
+  }
+
+  .scale__track {
+    height: 16px;
+  }
+
+  .scale__ticks {
+    margin-left: 144px;
+  }
+
+  .scale__ticks .is-minor {
+    visibility: visible;
+  }
+
+  .measures__cite {
+    grid-column: 1 / 7;
+  }
+
+  /* Anatomy */
+  .anatomy__stage {
+    display: block;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .anatomy__view {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+  }
+
+  .anatomy__color img {
+    object-position: 50% 50%;
+  }
+
+  .anatomy__word {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 29vw;
+    background-size: cover;
+    background-position: 50% 50%;
+  }
+
+  .anatomy__copy {
+    padding-block: 14vh 22vh;
+    row-gap: 24px;
+  }
+
+  .anatomy__copy .numeral,
+  .anatomy__title {
+    grid-column: 1 / 7;
+  }
+
+  .anatomy__title {
+    font-size: 7vw;
+  }
+
+  .anatomy__body {
+    grid-column: 7 / 12;
+    grid-row: 2 / 4;
+    font-size: 1.0625rem;
+  }
+
+  .anatomy__copy .facts {
+    grid-column: 1 / 5;
+    grid-row: 3;
+  }
+
+  .anatomy__copy .cite {
+    grid-column: 7 / 12;
+  }
+
+  /* Relatives */
   .closing {
     align-items: center;
     padding-block: 30vh 18vh;

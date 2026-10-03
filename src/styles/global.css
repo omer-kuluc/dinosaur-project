@@ -42,23 +42,6 @@
   --z-overlay: 200;
 }
 
-@media (min-width: 600px) {
-  :root {
-    --cols: 8;
-    --margin: 32px;
-    --gap: 20px;
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --cols: 12;
-    --margin: clamp(40px, 4vw, 72px);
-    --gap: 24px;
-    --nav-h: 72px;
-  }
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
@@ -331,39 +314,6 @@ button {
   display: none;
 }
 
-@media (min-width: 1024px) {
-  .nav__links {
-    display: flex;
-    gap: 36px;
-  }
-  .nav__links a {
-    position: relative;
-    font-size: 0.875rem;
-    text-decoration: none;
-    opacity: 0.72;
-    transition: opacity 0.4s var(--ease-out);
-  }
-  .nav__links a::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -4px;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.5s var(--ease-out);
-  }
-  .nav__links a:hover {
-    opacity: 1;
-  }
-  .nav__links a:hover::after {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-}
-
 /* ---------- Depth meter ----------
    Below 1024px the runner crosses a ground line at the bottom of the
    screen, as in the offline game. From 1024px it descends a vertical
@@ -441,7 +391,194 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
-@media (min-width: 1024px) {
+/* Pixel cactus: size = bitmap cells x --px */
+.cactus {
+  --px: 2px;
+  width: calc(var(--w) * var(--px));
+  height: calc(var(--h) * var(--px));
+}
+
+/* Pixel runner */
+.rex {
+  fill: currentColor;
+  overflow: visible;
+  transition: fill 0.5s var(--ease-out);
+}
+.rex__lid {
+  fill: transparent;
+}
+.rex.is-blink .rex__lid {
+  fill: currentColor;
+}
+.rex__legs {
+  display: none;
+}
+.rex[data-pose='stand'] .rex__legs--stand,
+.rex[data-pose='run1'] .rex__legs--run1,
+.rex[data-pose='run2'] .rex__legs--run2 {
+  display: inline;
+}
+/* Below 1024px the sprite faces its direction of travel. */
+.meter__rex[data-dir='back'] {
+  transform: scaleX(-1);
+}
+
+/* Light chapters: fixed UI switches to dark ink, each piece judged by
+   the chapter under its own position. */
+.is-light-top .nav {
+  color: var(--black);
+}
+.is-light-top .nav::before {
+  opacity: 0;
+}
+.is-light-bottom .meter {
+  color: var(--black);
+}
+.is-light-bottom .meter__track {
+  background: rgba(0, 0, 0, 0.3);
+}
+.is-light-bottom .meter::before {
+  background: linear-gradient(0deg, rgba(255, 255, 255, 0.94) 30%, transparent);
+}
+.is-light-bottom .meter__readout {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* While the intro plays, the fixed UI waits. */
+.is-intro .nav,
+.is-intro .meter {
+  opacity: 0;
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  row-gap: 8px;
+  padding-block: 12vh calc(72px + env(safe-area-inset-bottom));
+}
+
+.footer::before {
+  content: '';
+  grid-column: 1 / -1;
+  height: 1px;
+  margin-bottom: 32px;
+  background: var(--rule);
+}
+
+.footer__mark {
+  grid-column: 1 / -1;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.footer__note {
+  grid-column: 1 / -1;
+  max-width: 48ch;
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+
+/* ---------- Grid overlay (press G) ---------- */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  pointer-events: none;
+}
+
+.grid-overlay__cols {
+  height: 100%;
+}
+
+.grid-overlay__cols span {
+  background: rgba(201, 154, 85, 0.1);
+  box-shadow:
+    inset 1px 0 rgba(201, 154, 85, 0.5),
+    inset -1px 0 rgba(201, 154, 85, 0.5);
+}
+
+.grid-overlay__cols span:nth-child(n + 5) {
+  display: none;
+}
+
+.grid-overlay__label {
+  position: fixed;
+  left: var(--margin);
+  top: calc(var(--nav-h) + 8px);
+  padding: 4px 8px;
+  background: var(--black);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+}
+.grid-overlay__label::after {
+  content: '4 cols / 12px gap / 16px margin';
+}
+/* =============================================================
+   Tablet (600px and up)
+============================================================= */
+@media (width >= 600px) {
+  /* Tokens */
+  :root {
+    --cols: 8;
+    --margin: 32px;
+    --gap: 20px;
+  }
+  /* Grid overlay (press G) */
+  .grid-overlay__cols span:nth-child(n + 5) {
+    display: block;
+  }
+  .grid-overlay__cols span:nth-child(n + 9) {
+    display: none;
+  }
+  .grid-overlay__label::after {
+    content: '8 cols / 20px gap / 32px margin';
+  }
+}
+/* =============================================================
+   Desktop (1024px and up)
+============================================================= */
+@media (width >= 1024px) {
+  /* Tokens */
+  :root {
+    --cols: 12;
+    --margin: clamp(40px, 4vw, 72px);
+    --gap: 24px;
+    --nav-h: 72px;
+  }
+  /* Nav */
+  .nav__links {
+    display: flex;
+    gap: 36px;
+  }
+  .nav__links a {
+    position: relative;
+    font-size: 0.875rem;
+    text-decoration: none;
+    opacity: 0.72;
+    transition: opacity 0.4s var(--ease-out);
+  }
+  .nav__links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .nav__links a:hover {
+    opacity: 1;
+  }
+  .nav__links a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  /* Depth meter */
   .meter {
     --run: calc(44vh - 19px);
     left: auto;
@@ -497,68 +634,11 @@ button {
     transform: translateX(-50%) rotate(180deg);
     white-space: nowrap;
   }
-}
-
-/* Pixel cactus: size = bitmap cells x --px */
-.cactus {
-  --px: 2px;
-  width: calc(var(--w) * var(--px));
-  height: calc(var(--h) * var(--px));
-}
-
-/* Pixel runner */
-.rex {
-  fill: currentColor;
-  overflow: visible;
-  transition: fill 0.5s var(--ease-out);
-}
-.rex__lid {
-  fill: transparent;
-}
-.rex.is-blink .rex__lid {
-  fill: currentColor;
-}
-.rex__legs {
-  display: none;
-}
-.rex[data-pose='stand'] .rex__legs--stand,
-.rex[data-pose='run1'] .rex__legs--run1,
-.rex[data-pose='run2'] .rex__legs--run2 {
-  display: inline;
-}
-/* Below 1024px the sprite faces its direction of travel. */
-.meter__rex[data-dir='back'] {
-  transform: scaleX(-1);
-}
-@media (min-width: 1024px) {
   /* On the vertical gauge it always faces the page. */
   .meter__rex,
   .meter__rex[data-dir='back'] {
     transform: scaleX(-1);
   }
-}
-
-/* Light chapters: fixed UI switches to dark ink, each piece judged by
-   the chapter under its own position. */
-.is-light-top .nav {
-  color: var(--black);
-}
-.is-light-top .nav::before {
-  opacity: 0;
-}
-.is-light-bottom .meter {
-  color: var(--black);
-}
-.is-light-bottom .meter__track {
-  background: rgba(0, 0, 0, 0.3);
-}
-.is-light-bottom .meter::before {
-  background: linear-gradient(0deg, rgba(255, 255, 255, 0.94) 30%, transparent);
-}
-.is-light-bottom .meter__readout {
-  color: rgba(0, 0, 0, 0.6);
-}
-@media (min-width: 1024px) {
   .is-light-bottom .meter {
     color: var(--white);
   }
@@ -579,44 +659,7 @@ button {
   .is-light .meter__era {
     color: rgba(0, 0, 0, 0.6);
   }
-}
-
-/* While the intro plays, the fixed UI waits. */
-.is-intro .nav,
-.is-intro .meter {
-  opacity: 0;
-}
-
-/* ---------- Footer ---------- */
-.footer {
-  row-gap: 8px;
-  padding-block: 12vh calc(72px + env(safe-area-inset-bottom));
-}
-
-.footer::before {
-  content: '';
-  grid-column: 1 / -1;
-  height: 1px;
-  margin-bottom: 32px;
-  background: var(--rule);
-}
-
-.footer__mark {
-  grid-column: 1 / -1;
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  letter-spacing: 0.02em;
-  line-height: 1;
-}
-
-.footer__note {
-  grid-column: 1 / -1;
-  max-width: 48ch;
-  font-size: 0.8125rem;
-  color: var(--ink-faint);
-}
-
-@media (min-width: 1024px) {
+  /* Footer */
   .footer {
     padding-bottom: 48px;
   }
@@ -628,58 +671,7 @@ button {
     justify-self: end;
     text-align: right;
   }
-}
-
-/* ---------- Grid overlay (press G) ---------- */
-.grid-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-overlay);
-  pointer-events: none;
-}
-
-.grid-overlay__cols {
-  height: 100%;
-}
-
-.grid-overlay__cols span {
-  background: rgba(201, 154, 85, 0.1);
-  box-shadow:
-    inset 1px 0 rgba(201, 154, 85, 0.5),
-    inset -1px 0 rgba(201, 154, 85, 0.5);
-}
-
-.grid-overlay__cols span:nth-child(n + 5) {
-  display: none;
-}
-
-.grid-overlay__label {
-  position: fixed;
-  left: var(--margin);
-  top: calc(var(--nav-h) + 8px);
-  padding: 4px 8px;
-  background: var(--black);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--amber);
-}
-.grid-overlay__label::after {
-  content: '4 cols / 12px gap / 16px margin';
-}
-
-@media (min-width: 600px) {
-  .grid-overlay__cols span:nth-child(n + 5) {
-    display: block;
-  }
-  .grid-overlay__cols span:nth-child(n + 9) {
-    display: none;
-  }
-  .grid-overlay__label::after {
-    content: '8 cols / 20px gap / 32px margin';
-  }
-}
-
-@media (min-width: 1024px) {
+  /* Grid overlay (press G) */
   .grid-overlay__cols span:nth-child(n + 9) {
     display: block;
   }

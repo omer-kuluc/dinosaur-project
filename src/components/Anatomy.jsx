@@ -33,32 +33,25 @@ export default function Anatomy() {
 
         const restores = [scrambleIn(q('.numeral')[0], { trigger: q('.anatomy__copy')[0], start: 'top 90%', duration: 0.8 }), scrambleIn(q('.cite')[0], { duration: 1.4 })]
 
-        if (desktop) {
-          // A closed band across the middle of the word, as wide as the word.
-          const band = () => {
-            const s = stage.getBoundingClientRect()
-            const l = letters.getBoundingClientRect()
-            const mid = ((l.top + l.height / 2 - s.top) / s.height) * 100
-            const left = ((l.left - s.left) / s.width) * 100
-            const right = ((s.right - l.right) / s.width) * 100
-            return `inset(${mid}% ${right}% ${100 - mid}% ${left}%)`
-          }
-          gsap
-            .timeline({ scrollTrigger: { trigger: stage, start: 'top top', end: '+=100%', pin: true, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true } })
-            .fromTo(view, { clipPath: band }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: 'power2.inOut' }, 0.1)
-            .fromTo(photo, { scale: 1.08 }, { scale: 1, duration: 1.1, ease: 'power1.out' }, 0.1)
-            .to(word, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, 0.25)
-            .to({}, { duration: 0.15 })
-          // Chapter text sits below the pinned stage and reads in normally.
-          headingLines(q('.anatomy__title')[0], { scrub: true, start: 'top 88%', end: 'top 55%' })
-        } else {
-          gsap.from(word, { opacity: 0, y: 24, duration: 1.4, ease: 'expo.out', scrollTrigger: { trigger: word, start: 'top 85%', once: true } })
-          gsap
-            .timeline({ scrollTrigger: { trigger: view, start: 'top 75%', once: true } })
-            .fromTo(view, { clipPath: 'inset(16% 12% 16% 12%)', autoAlpha: 0 }, { clipPath: 'inset(0% 0% 0% 0%)', autoAlpha: 1, duration: 1.6, ease: 'expo.inOut' }, 0)
-            .fromTo(photo, { scale: 1.12 }, { scale: 1, duration: 2, ease: 'expo.out' }, 0)
-          headingLines(q('.anatomy__title')[0])
+        // A closed band across the middle of the word, as wide as the word.
+        const band = () => {
+          const s = stage.getBoundingClientRect()
+          const l = letters.getBoundingClientRect()
+          const mid = ((l.top + l.height / 2 - s.top) / s.height) * 100
+          const left = ((l.left - s.left) / s.width) * 100
+          const right = ((s.right - l.right) / s.width) * 100
+          return `inset(${mid}% ${right}% ${100 - mid}% ${left}%)`
         }
+        // The same pinned window opening on every screen; phones and tablets
+        // use a shorter scroll distance.
+        gsap
+          .timeline({ scrollTrigger: { trigger: stage, start: 'top top', end: desktop ? '+=100%' : '+=80%', pin: true, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true } })
+          .fromTo(view, { clipPath: band }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: 'power2.inOut' }, 0.1)
+          .fromTo(photo, { scale: 1.08 }, { scale: 1, duration: 1.1, ease: 'power1.out' }, 0.1)
+          .to(word, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, 0.25)
+          .to({}, { duration: 0.15 })
+        // Chapter text sits below the pinned stage and reads in normally.
+        headingLines(q('.anatomy__title')[0], desktop ? { scrub: true, start: 'top 88%', end: 'top 55%' } : {})
 
         bodyLines(q('.anatomy__body')[0])
         gsap.fromTo(q('.anatomy .facts > div'), { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, stagger: 0.12, ease: 'expo.out', scrollTrigger: { trigger: q('.anatomy .facts')[0], start: 'top 92%', once: true } })
