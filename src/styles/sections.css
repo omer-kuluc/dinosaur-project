@@ -175,6 +175,10 @@
    crosses the ends of the letters. Phones stack title over subject.
 ---------------------------------------------------------------- */
 .hero {
+  /* Width-based, but capped by the height so on wider portrait screens the
+     title stops growing and the dinosaur keeps its share of the space. */
+  --hero-fs: min(21.5vw, 11svh);
+  --hero-h: max(100svh, 600px);
   position: relative;
   height: 100svh;
   min-height: 600px;
@@ -191,7 +195,7 @@
 
 .hero__title {
   grid-column: 1 / -1;
-  font-size: 21.5vw;
+  font-size: var(--hero-fs);
   line-height: 0.84;
   letter-spacing: -0.02em;
 }
@@ -207,27 +211,33 @@
   gap: 0.22em;
 }
 
-/* Below 1024px the dinosaur is sized to the room left under the title
-   (4 lines at 0.84 line-height), minus the sink's 40px offset, so the two
-   never overlap; it stays at full size wherever that room allows. */
+/* Below 1024px the dinosaur fills a zone and is centred in it. Portrait:
+   the zone is everything between the title (4 lines at 0.84 line-height)
+   and the bottom bar. It grows to whatever the zone allows, up to 1.18x
+   the zone width; beyond that the snout would be cut on the left. */
 .hero__media {
-  --title-bottom: calc(var(--nav-h) + 3svh + 4 * 0.84 * 21.5vw);
-  --room: calc(max(100svh, 600px) - var(--title-bottom) - 2svh - 40px - 64px - env(safe-area-inset-bottom));
-  --dino-w: min(162vw, var(--room) * 1024 / 712);
+  --zone-left: 0px;
+  --zone-w: 100vw;
+  --zone-top: calc(var(--nav-h) + 3svh + 4 * 0.84 * var(--hero-fs) + 2svh);
+  --zone-h: calc(var(--hero-h) - var(--zone-top) - 64px - env(safe-area-inset-bottom));
+  --dino-w: max(0px, min(var(--zone-w) * 1.18, var(--zone-h) * 1024 / 712));
   position: absolute;
   z-index: 2;
-  /* Right-anchored so the body always exits off-screen (44 of 162 parts). */
-  right: calc(var(--dino-w) * -44 / 162);
-  bottom: calc(64px + env(safe-area-inset-bottom));
+  left: calc(var(--zone-left) + (var(--zone-w) - var(--dino-w)) / 2);
+  top: calc(var(--zone-top) + (var(--zone-h) - var(--dino-w) * 712 / 1024) / 2);
   width: var(--dino-w);
   aspect-ratio: 1024 / 712;
   pointer-events: none;
 }
 
+/* The cut-out's body ends in a hard edge on the right; below 1024px it
+   dissolves into the background (photo and ASCII alike) wherever it shows. */
 .hero__sink {
   position: absolute;
   inset: 0;
   will-change: transform;
+  -webkit-mask-image: linear-gradient(to right, #000 80%, transparent 99%);
+  mask-image: linear-gradient(to right, #000 80%, transparent 99%);
 }
 
 .hero__dino {
@@ -852,18 +862,37 @@
   }
 
   /* Hero */
-  .hero__title {
-    font-size: 17vw;
+  .hero {
+    --hero-fs: min(17vw, 11svh);
   }
 
-  .hero__media {
-    --title-bottom: calc(var(--nav-h) + 3svh + 4 * 0.84 * 17vw);
-    --room: calc(max(100svh, 600px) - var(--title-bottom) - 2svh - 40px - 4svh);
-    --dino-w: min(108vw, var(--room) * 1024 / 712);
-    left: auto;
-    right: -12vw;
-    width: var(--dino-w);
-    bottom: 4svh;
+  /* Landscape below 1024px: title on the left, dinosaur centred in the right
+     half. The title is sized to half the width (and to the height). */
+  @media (orientation: landscape) and (width < 1024px) {
+    /* Sized and centred against the visible screen, not the 600px minimum
+       hero height, so landscape phones keep everything on the first screen. */
+    .hero {
+      --hero-fs: min(12.5vw, calc((100svh - var(--nav-h) - 64px - 6svh) / 3.36));
+    }
+
+    .hero__stage {
+      bottom: auto;
+      height: 100svh;
+      align-content: center;
+      padding-top: var(--nav-h);
+      padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    }
+
+    .hero__title {
+      grid-column: 1 / 5;
+    }
+
+    .hero__media {
+      --zone-left: 50vw;
+      --zone-w: 50vw;
+      --zone-top: var(--nav-h);
+      --zone-h: calc(100svh - var(--nav-h) - 64px - env(safe-area-inset-bottom));
+    }
   }
 
   /* Statement */
@@ -974,9 +1003,16 @@
   }
 
   .hero__media {
+    top: auto;
+    left: auto;
     right: -5.5vw;
     bottom: -3svh;
     width: 72vw;
+  }
+
+  .hero__sink {
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   /* Statement */
