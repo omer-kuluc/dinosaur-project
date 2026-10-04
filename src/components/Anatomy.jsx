@@ -46,7 +46,7 @@ export default function Anatomy() {
         // The same pinned window opening on every screen; phones and tablets
         // use a shorter scroll distance.
         gsap
-          .timeline({ scrollTrigger: { trigger: stage, start: 'top top', end: desktop ? '+=100%' : '+=80%', pin: true, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true } })
+          .timeline({ scrollTrigger: { trigger: stage, start: 'top top', end: desktop ? '+=100%' : '+=80%', pin: true, scrub: 0.8, invalidateOnRefresh: true } })
           .fromTo(view, { clipPath: band }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: 'power2.inOut' }, 0.1)
           .fromTo(photo, { scale: 1.08 }, { scale: 1, duration: 1.1, ease: 'power1.out' }, 0.1)
           .to(word, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, 0.25)

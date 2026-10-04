@@ -121,3 +121,16 @@ export const eraOf = (m) => {
   for (const [start, label] of ERAS) if (m < start) name = label
   return m < 0.5 ? 'Today' : name
 }
+
+// The final section: the works that inspired the project, and the design
+// inspiration, each credited explicitly.
+export const FINALE = {
+  title: 'Inspirations',
+  works: [
+    { name: 'The Dinosaurs', medium: 'Docuseries, Netflix', year: '2026' },
+    { name: 'Jurassic Park', medium: 'Film', year: '1993' },
+    { name: 'Dinosaur Game', medium: 'Browser game, Chrome offline page', year: '2014', runner: true },
+  ],
+  credit: { heading: 'Design Inspiration', work: 'ASCII Card Design', author: 'Hayriye Akgüller' },
+  note: 'A design study. Illustrations are artistic reconstructions, not scientific renderings.',
+}

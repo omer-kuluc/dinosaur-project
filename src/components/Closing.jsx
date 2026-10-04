@@ -47,12 +47,7 @@ export default function Closing() {
         headingLines(q('.closing__title')[0], desktop ? { scrub: true, start: 'top 82%', end: 'top 40%' } : {})
         bodyLines(q('.closing__body')[0])
 
-        // The last line resolves slowly: a wipe while its wide tracking draws in.
-        gsap.fromTo(
-          q('.closing__kicker'),
-          { clipPath: 'inset(0% 100% 0% 0%)', letterSpacing: '0.14em' },
-          { clipPath: 'inset(0% 0% 0% 0%)', letterSpacing: '0em', duration: 2.2, ease: 'expo.out', scrollTrigger: { trigger: q('.closing__kicker')[0], start: 'top 88%', once: true } },
-        )
+        // The last line ("Every bird...") has no animation: it simply appears.
         const restore = scrambleIn(q('.cite')[0], { duration: 1.4 })
         gsap.from(q('.closing__action'), { opacity: 0, y: 16, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: q('.closing__action')[0], start: 'top 95%', once: true } })
 

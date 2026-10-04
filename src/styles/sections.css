@@ -770,10 +770,11 @@
   padding-block: 22vh 14vh;
 }
 
+/* Phones and tablets: centred in the page. Desktop keeps it on the right. */
 .closing__media {
   position: relative;
   grid-column: 1 / -1;
-  margin: 0 calc(var(--margin) * -1) 0 28px;
+  margin: 0;
 }
 
 .closing__frame {
@@ -951,8 +952,7 @@
 
   /* Relatives */
   .closing__media {
-    grid-column: 3 / -1;
-    margin-left: 0;
+    grid-column: 2 / 8;
   }
 }
 
@@ -1270,6 +1270,7 @@
   .closing__media {
     grid-column: 7 / 13;
     grid-row: 1;
+    margin: 0 calc(var(--margin) * -1) 0 0;
   }
 
   .closing__frame {

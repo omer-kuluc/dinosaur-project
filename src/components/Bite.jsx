@@ -40,7 +40,7 @@ export default function Bite() {
         // One pinned, scroll-driven sequence on every screen; phones and tablets
         // use a shorter scroll distance for the same choreography.
         gsap
-          .timeline({ scrollTrigger: { trigger: root.current, start: 'top top', end: desktop ? '+=180%' : '+=150%', pin: true, scrub: 0.6, anticipatePin: 1 } })
+          .timeline({ scrollTrigger: { trigger: root.current, start: 'top top', end: desktop ? '+=180%' : '+=150%', pin: true, scrub: 0.6 } })
           .to(j, { p: 1, duration: 0.45, ease: 'power2.inOut', onUpdate: bite }, 0)
           .fromTo(photo, { scale: 1.25 }, { scale: 1, duration: 0.6, ease: 'power1.out' }, 0)
           .to(split.chars, { yPercent: 0, duration: 0.3, stagger: 0.03, ease: 'power3.out' }, 0.42)

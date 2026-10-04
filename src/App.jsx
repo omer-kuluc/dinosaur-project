@@ -15,6 +15,7 @@ import Bite from './components/Bite'
 import Measures from './components/Measures'
 import Anatomy from './components/Anatomy'
 import Closing from './components/Closing'
+import Finale from './components/Finale'
 import Atmosphere from './components/Atmosphere'
 import GridOverlay from './components/GridOverlay'
 
@@ -47,10 +48,7 @@ export default function App() {
         <Measures />
         <Anatomy />
         <Closing />
-        <footer className="footer grid">
-          <p className="footer__mark">The Night Archive</p>
-          <p className="footer__note">A design study. Illustrations are artistic reconstructions, not scientific renderings.</p>
-        </footer>
+        <Finale />
       </main>
       <Atmosphere />
       <Loader />
