@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { gsap, SplitText, useGSAP, MQ } from '../lib/gsap'
 import { jawClip } from '../lib/stepClip'
 import { scrambleIn } from '../lib/text'
+import { keepAligned } from '../lib/keepAligned'
 import { BITE, img } from '../data/content'
 import Picture from './Picture'
 
@@ -48,6 +49,8 @@ export default function Bite() {
           .to({}, { duration: 0.15 })
 
         restores.push(scrambleIn(q('.cite')[0], { trigger: root.current, start: desktop ? 'top -120%' : 'top -100%', duration: 1.4 }))
+        // Phones and tablets: re-measure this section's pin if content above it grows.
+        if (!desktop) restores.push(keepAligned(root.current))
         return () => {
           frame.style.clipPath = ''
           frame.style.webkitClipPath = ''

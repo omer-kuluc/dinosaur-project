@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, useGSAP, MQ } from '../lib/gsap'
 import { headingLines, bodyLines, scrambleIn } from '../lib/text'
+import { keepAligned } from '../lib/keepAligned'
 import { ANATOMY, img } from '../data/content'
 import Picture from './Picture'
 
@@ -56,6 +57,8 @@ export default function Anatomy() {
         bodyLines(q('.anatomy__body')[0])
         gsap.fromTo(q('.anatomy .facts > div'), { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, stagger: 0.12, ease: 'expo.out', scrollTrigger: { trigger: q('.anatomy .facts')[0], start: 'top 92%', once: true } })
 
+        // Phones and tablets: re-measure this section's pin if content above it grows.
+        if (!desktop) restores.push(keepAligned(root.current))
         return () => restores.forEach((r) => r())
       })
 
