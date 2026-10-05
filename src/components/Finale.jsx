@@ -78,6 +78,7 @@ export default function Finale() {
           .fromTo(q('.ascii-card__side'), { clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.7, ease: 'steps(10)' }, 0.3)
         restores.push(scrambleIn(q('.ascii-card__work')[0], { trigger: card, start: cst.start, delay: 0.5, duration: 1.6 }))
         restores.push(scrambleIn(q('.ascii-card__author')[0], { trigger: card, start: cst.start, delay: 1.3, duration: 1 }))
+        restores.push(scrambleIn(q('.ascii-card__link')[0], { trigger: card, start: cst.start, delay: 1.7, duration: 0.9 }))
         gsap.from(q('.finale__note'), { opacity: 0, y: 10, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: q('.finale__note')[0], start: 'top 95%', once: true } })
 
         return () => restores.forEach((r) => r())
@@ -127,15 +128,28 @@ export default function Finale() {
         </ol>
 
         <h2 className="credit__heading">{credit.heading}</h2>
-        <div className="ascii-card" role="note" aria-label={`${credit.work} by ${credit.author}`}>
+        <div className="ascii-card">
           <p className="ascii-card__edge" aria-hidden="true">
             +<span>{DASHES}</span>+
           </p>
-          <div className="ascii-card__body" aria-hidden="true">
-            <span className="ascii-card__side ascii-card__side--l">{PIPES}</span>
+          <div className="ascii-card__body">
+            <span className="ascii-card__side ascii-card__side--l" aria-hidden="true">
+              {PIPES}
+            </span>
             <p className="ascii-card__work">“{credit.work}”</p>
             <p className="ascii-card__author">by {credit.author}</p>
-            <span className="ascii-card__side ascii-card__side--r">{PIPES}</span>
+            <a
+              className="ascii-card__link"
+              href={credit.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`View ${credit.work} on Dribbble (opens in a new tab)`}
+            >
+              [ Work ↗ ]
+            </a>
+            <span className="ascii-card__side ascii-card__side--r" aria-hidden="true">
+              {PIPES}
+            </span>
           </div>
           <p className="ascii-card__edge" aria-hidden="true">
             +<span>{DASHES}</span>+

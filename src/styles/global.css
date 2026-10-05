@@ -314,6 +314,90 @@ button {
   display: none;
 }
 
+/* Phones: the links live in a full-screen menu behind a two-bar toggle. */
+.nav__toggle {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin-right: -10px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.nav__bar {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  height: 1.5px;
+  background: currentColor;
+}
+
+.nav__bar:first-child {
+  top: 15px;
+}
+
+.nav__bar:last-child {
+  top: 23px;
+}
+
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-nav) - 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--nav-h) var(--margin) calc(72px + env(safe-area-inset-bottom));
+  background: var(--abyss);
+  visibility: hidden;
+  clip-path: inset(0% 0% 100% 0%);
+}
+
+.menu__list {
+  display: grid;
+  gap: 2.5vh;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu__link {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.menu__num {
+  min-width: 1.8em;
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.menu__mask {
+  display: block;
+  overflow: clip;
+  padding-top: 0.06em;
+}
+
+.menu__label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 17vw;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.menu__link:focus-visible {
+  outline-offset: 6px;
+}
+
+
 /* ---------- Depth meter ----------
    Below 1024px the runner crosses a ground line at the bottom of the
    screen, as in the offline game. From 1024px it descends a vertical
@@ -632,6 +716,23 @@ button {
   color: var(--ink-soft);
 }
 
+/* The link to the referenced work, written as ASCII to belong to the card. */
+.ascii-card__link {
+  display: inline-block;
+  margin-top: 1.6em;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  text-decoration: none;
+  white-space: pre;
+  transition: color 0.4s var(--ease-out);
+}
+
+.ascii-card__link:hover,
+.ascii-card__link:focus-visible {
+  color: #c79954;
+}
+
 .finale__note {
   grid-column: 1 / -1;
   margin-top: 28px;
@@ -698,26 +799,7 @@ button {
   .grid-overlay__label::after {
     content: '8 cols / 20px gap / 32px margin';
   }
-  /* Finale */
-  .work__name {
-    font-size: 12.5vw;
-  }
-  .ascii-card__work {
-    font-size: 8vw;
-  }
-}
-/* =============================================================
-   Desktop (1024px and up)
-============================================================= */
-@media (width >= 1024px) {
-  /* Tokens */
-  :root {
-    --cols: 12;
-    --margin: clamp(40px, 4vw, 72px);
-    --gap: 24px;
-    --nav-h: 72px;
-  }
-  /* Nav */
+  /* Nav: tablets show the desktop links; the phone menu is not used. */
   .nav__links {
     display: flex;
     gap: 36px;
@@ -747,6 +829,38 @@ button {
   .nav__links a:hover::after {
     transform: scaleX(1);
     transform-origin: left;
+  }
+  .nav__toggle,
+  .menu {
+    display: none;
+  }
+  /* Finale */
+  .work__name {
+    font-size: 12.5vw;
+  }
+  .ascii-card__work {
+    font-size: 8vw;
+  }
+}
+/* =============================================================
+   Desktop (1024px and up)
+============================================================= */
+@media (width >= 1024px) {
+  /* Tokens */
+  :root {
+    --cols: 12;
+    --margin: clamp(40px, 4vw, 72px);
+    --gap: 24px;
+    --nav-h: 72px;
+  }
+  /* Nav: hover turns the links amber; the underline follows the text colour. */
+  .nav__links a {
+    transition:
+      opacity 0.4s var(--ease-out),
+      color 0.4s var(--ease-out);
+  }
+  .nav__links a:hover {
+    color: #c79954;
   }
   /* Depth meter */
   .meter {

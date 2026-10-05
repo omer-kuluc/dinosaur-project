@@ -131,6 +131,11 @@ export const FINALE = {
     { name: 'Jurassic Park', medium: 'Film', year: '1993' },
     { name: 'Dinosaur Game', medium: 'Browser game, Chrome offline page', year: '2014', runner: true },
   ],
-  credit: { heading: 'Design Inspiration', work: 'ASCII Card Design', author: 'Hayriye Akgüller' },
+  credit: {
+    heading: 'Design Inspiration',
+    work: 'ASCII Card Design',
+    author: 'Hayriye Akgüller',
+    url: 'https://dribbble.com/shots/27386667-ASCII-Card-Design',
+  },
   note: 'A design study. Illustrations are artistic reconstructions, not scientific renderings.',
 }
