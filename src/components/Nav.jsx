@@ -98,7 +98,7 @@ export default function Nav() {
     <>
       <header ref={ref} className="nav">
         <a className="nav__mark" href="#top" onClick={(e) => (open ? goFromMenu(e, 0) : go(e, 0))}>
-          The Night Archive
+          Tyrant Lizard King
         </a>
         <nav className="nav__links" aria-label="Sections">
           {LINKS.map(([href, label]) => (
